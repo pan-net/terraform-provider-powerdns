@@ -27,6 +27,18 @@ resource "powerdns_record" "foobar" {
 }
 ```
 
+For PTR record example:
+```hcl
+# Add PTR record to the zone
+resource "powerdns_record" "foobar" {
+  zone    = "0.10.in-addr.arpa."
+  name    = "10.0.0.10.in-addr.arpa."
+  type    = "PTR"
+  ttl     = 300
+  records = ["www.example.com."]
+}
+```
+
 For the legacy API (PowerDNS version 3.4):
 
 ```hcl
