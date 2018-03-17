@@ -220,13 +220,49 @@ func (c *Client) ZoneExists(name string) (bool, error) {
 	return resp.StatusCode == http.StatusOK, nil
 }
 
-func (c *Client) CreateZone(zoneInfo ZoneInfo) error {
+// CreateZone creates a zone
+func (c *Client) CreateZone(zoneInfo ZoneInfo) (ZoneInfo, error) {
+	body, err := json.Marshal(zoneInfo)
+	if err != nil {
+		return ZoneInfo{}, err
+	}
+
+	req, err := c.newRequest("POST", "/servers/localhost/zones", body)
+	if err != nil {
+		return ZoneInfo{}, err
+	}
+
+	resp, err := c.Http.Do(req)
+	if err != nil {
+		return ZoneInfo{}, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusCreated {
+		errorResp := new(errorResponse)
+		if err = json.NewDecoder(resp.Body).Decode(errorResp); err != nil {
+			return ZoneInfo{}, fmt.Errorf("Error creating zone: %s", zoneInfo.Name)
+		}
+		return ZoneInfo{}, fmt.Errorf("Error creating zone: %s, reason: %q", zoneInfo.Name, errorResp.ErrorMsg)
+	}
+
+	var createdZoneInfo ZoneInfo
+	err = json.NewDecoder(resp.Body).Decode(&createdZoneInfo)
+	if err != nil {
+		return ZoneInfo{}, err
+	}
+
+	return createdZoneInfo, nil
+}
+
+// UpdateZone updates a zone
+func (c *Client) UpdateZone(name string, zoneInfo ZoneInfo) error {
 	body, err := json.Marshal(zoneInfo)
 	if err != nil {
 		return err
 	}
 
-	req, err := c.newRequest("POST", "/servers/localhost/zones", body)
+	req, err := c.newRequest("PUT", fmt.Sprintf("/servers/localhost/zones/%s", name), body)
 	if err != nil {
 		return err
 	}
@@ -237,12 +273,12 @@ func (c *Client) CreateZone(zoneInfo ZoneInfo) error {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusCreated {
+	if resp.StatusCode != http.StatusNoContent {
 		errorResp := new(errorResponse)
 		if err = json.NewDecoder(resp.Body).Decode(errorResp); err != nil {
-			return fmt.Errorf("Error creating zone: %s", zoneInfo.Name)
+			return fmt.Errorf("Error updating zone: %s", zoneInfo.Name)
 		}
-		return fmt.Errorf("Error creating zone: %s, reason: %q", zoneInfo.Name, errorResp.ErrorMsg)
+		return fmt.Errorf("Error updating zone: %s, reason: %q", zoneInfo.Name, errorResp.ErrorMsg)
 	}
 
 	return nil

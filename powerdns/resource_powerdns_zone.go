@@ -1,9 +1,8 @@
 package powerdns
 
 import (
-	"log"
-
 	"fmt"
+	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -12,6 +11,7 @@ func resourcePDNSZone() *schema.Resource {
 	return &schema.Resource{
 		Create: resourcePDNSZoneCreate,
 		Read:   resourcePDNSZoneRead,
+		Update: resourcePDNSZoneUpdate,
 		Delete: resourcePDNSZoneDelete,
 		Exists: resourcePDNSZoneExists,
 
@@ -25,7 +25,6 @@ func resourcePDNSZone() *schema.Resource {
 			"kind": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 
 			"nameservers": {
@@ -52,11 +51,12 @@ func resourcePDNSZoneCreate(d *schema.ResourceData, meta interface{}) error {
 		Nameservers: nameservers,
 	}
 
-	if err := client.CreateZone(zoneInfo); err != nil {
+	createdZoneInfo, err := client.CreateZone(zoneInfo)
+	if err != nil {
 		return err
 	}
 
-	d.SetId(zoneInfo.Name)
+	d.SetId(createdZoneInfo.Id)
 
 	return nil
 }
@@ -76,16 +76,33 @@ func resourcePDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
+func resourcePDNSZoneUpdate(d *schema.ResourceData, meta interface{}) error {
+	log.Printf("[DEBUG] Updating PowerDNS Zone: %s", d.Id())
+
+	client := meta.(*Client)
+
+	zoneInfo := ZoneInfo{}
+	shouldUpdate := false
+	if d.HasChange("kind") {
+		zoneInfo.Kind = d.Get("kind").(string)
+		shouldUpdate = true
+	}
+
+	if shouldUpdate {
+		return client.UpdateZone(d.Id(), zoneInfo)
+	}
+	return nil
+}
+
 func resourcePDNSZoneDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*Client)
 
 	log.Printf("[INFO] Deleting PowerDNS Zone: %s", d.Id())
-	err := client.DeleteZone(d.Get("name").(string))
+	err := client.DeleteZone(d.Id())
 
 	if err != nil {
 		return fmt.Errorf("Error deleting PowerDNS Zone: %s", err)
 	}
-
 	return nil
 }
 

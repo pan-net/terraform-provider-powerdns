@@ -68,5 +68,5 @@ const testPDNSZoneConfig = `
 resource "powerdns_zone" "test" {
 	name = "sysa.abc."
 	kind = "Native"
-	nameservers = [ "ns1.sysa.abc.", "ns2.sysa.abc." ]
+	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
 }`
