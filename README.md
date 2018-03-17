@@ -54,10 +54,14 @@ In order to test the provider, you can simply run `make test`.
 $ make test
 ```
 
-In order to run the full suite of Acceptance tests, run `make testacc`.
-
-*Note:* Acceptance tests create real resources, and often cost money to run.
+In order to run the full suite of acceptance tests, run `make testacc`.
 
 ```sh
 $ make testacc
+```
+
+You can also run acceptance tests using `docker-compose`:
+
+```sh
+docker-compose run --rm testacc
 ```
