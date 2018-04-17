@@ -277,6 +277,7 @@ resource "powerdns_record" "test-a" {
 	type = "A"
 	ttl = 60
 	records = [ "1.1.1.1", "2.2.2.2" ]
+	setptr = true
 }`
 
 const testPDNSRecordConfigHyphenedWithCount = `
@@ -287,6 +288,7 @@ resource "powerdns_record" "test-counted" {
 	type = "A"
 	ttl = 60
 	records = [ "1.1.1.${count.index}" ]
+	setptr = true
 }`
 
 const testPDNSRecordConfigAAAA = `
@@ -296,6 +298,7 @@ resource "powerdns_record" "test-aaaa" {
 	type = "AAAA"
 	ttl = 60
 	records = [ "2001:DB8:2000:bf0::1", "2001:DB8:2000:bf1::1" ]
+	setptr = true
 }`
 
 const testPDNSRecordConfigCNAME = `
@@ -305,6 +308,7 @@ resource "powerdns_record" "test-cname" {
 	type = "CNAME"
 	ttl = 60
 	records = [ "redis.example.com" ]
+	setptr = true
 }`
 
 const testPDNSRecordConfigHINFO = `
@@ -314,6 +318,7 @@ resource "powerdns_record" "test-hinfo" {
 	type = "HINFO"
 	ttl = 60
 	records = [ "\"PC-Intel-2.4ghz\" \"Linux\"" ]
+	setptr = true
 }`
 
 const testPDNSRecordConfigLOC = `
@@ -323,6 +328,7 @@ resource "powerdns_record" "test-loc" {
 	type = "LOC"
 	ttl = 60
 	records = [ "51 56 0.123 N 5 54 0.000 E 4.00m 1.00m 10000.00m 10.00m" ]
+	setptr = true
 }`
 
 const testPDNSRecordConfigMX = `
@@ -332,6 +338,7 @@ resource "powerdns_record" "test-mx" {
 	type = "MX"
 	ttl = 60
 	records = [ "10 mail.example.com" ]
+	setptr = true
 }`
 
 const testPDNSRecordConfigMXMulti = `
@@ -341,6 +348,7 @@ resource "powerdns_record" "test-mx-multi" {
 	type = "MX"
 	ttl = 60
 	records = [ "10 mail1.example.com", "20 mail2.example.com" ]
+	setptr = true
 }`
 
 const testPDNSRecordConfigNAPTR = `
@@ -350,6 +358,7 @@ resource "powerdns_record" "test-naptr" {
 	type = "NAPTR"
 	ttl = 60
 	records = [ "100 50 \"s\" \"z3950+I2L+I2C\" \"\" _z3950._tcp.gatech.edu'." ]
+	setptr = true
 }`
 
 const testPDNSRecordConfigNS = `
@@ -359,6 +368,7 @@ resource "powerdns_record" "test-ns" {
 	type = "NS"
 	ttl = 60
 	records = [ "ns1.sysa.xyz", "ns2.sysa.xyz" ]
+	setptr = true
 }`
 
 const testPDNSRecordConfigSPF = `
@@ -368,6 +378,7 @@ resource "powerdns_record" "test-spf" {
 	type = "SPF"
 	ttl = 60
 	records = [ "\"v=spf1 +all\"" ]
+	setptr = true
 }`
 
 const testPDNSRecordConfigSSHFP = `
@@ -377,6 +388,7 @@ resource "powerdns_record" "test-sshfp" {
 	type = "SSHFP"
 	ttl = 60
 	records = [ "1 1 123456789abcdef67890123456789abcdef67890" ]
+	setptr = true
 }`
 
 const testPDNSRecordConfigSRV = `
@@ -386,6 +398,7 @@ resource "powerdns_record" "test-srv" {
 	type = "SRV"
 	ttl = 60
 	records = [ "0 10 6379 redis1.sysa.xyz", "0 10 6379 redis2.sysa.xyz", "10 10 6379 redis-replica.sysa.xyz" ]
+	setptr = true
 }`
 
 const testPDNSRecordConfigTXT = `
@@ -395,4 +408,5 @@ resource "powerdns_record" "test-txt" {
 	type = "TXT"
 	ttl = 60
 	records = [ "\"text record payload\"" ]
+	setptr = true
 }`

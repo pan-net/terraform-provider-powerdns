@@ -47,6 +47,13 @@ func resourcePDNSRecord() *schema.Resource {
 				ForceNew: true,
 				Set:      schema.HashString,
 			},
+
+			"setptr": {
+				Type:     schema.TypeBool,
+				Required: false,
+				Optional: true,
+				ForceNew: true,
+			},
 		},
 	}
 }
@@ -63,11 +70,14 @@ func resourcePDNSRecordCreate(d *schema.ResourceData, meta interface{}) error {
 	zone := d.Get("zone").(string)
 	ttl := d.Get("ttl").(int)
 	recs := d.Get("records").(*schema.Set).List()
+	setptr := d.Get("setptr").(bool)
 
 	if len(recs) > 0 {
 		records := make([]Record, 0, len(recs))
+		log.Printf("[INFO] setptr value : %#v", setptr)
 		for _, recContent := range recs {
-			records = append(records, Record{Name: rrSet.Name, Type: rrSet.Type, TTL: ttl, Content: recContent.(string)})
+			records = append(records, Record{Name: rrSet.Name, Type: rrSet.Type, TTL: ttl,
+				SetPTR: setptr, Content: recContent.(string)})
 		}
 		rrSet.Records = records
 
