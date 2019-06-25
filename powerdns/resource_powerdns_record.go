@@ -1,9 +1,8 @@
 package powerdns
 
 import (
-	"log"
-
 	"fmt"
+	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -152,7 +151,6 @@ func resourcePDNSRecordExists(d *schema.ResourceData, meta interface{}) (bool, e
 
 	if err != nil {
 		return false, fmt.Errorf("Error checking PowerDNS Record: %s", err)
-	} else {
-		return exists, nil
 	}
+	return exists, nil
 }
