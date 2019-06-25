@@ -1,0 +1,43 @@
+version: "3"
+services:
+  mysql:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+  pdns:
+    image: psitrax/powerdns
+    command:
+    - "--api"
+    - "--api-key=secret"
+    - "--webserver"
+    - "--webserver-address=0.0.0.0"
+    - "--webserver-allow-from=0.0.0.0/0"
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASS: secret
+    depends_on:
+    - mysql
+  testacc:
+    image: golang
+    command:
+    - sh
+    - -c
+    - |
+      while true; do
+        if curl -f http://pdns:8081/api -H "X-API-Key: secret"; then
+          break
+        fi
+        sleep 1
+      done
+      curl -X POST http://pdns:8081/api/v1/servers/localhost/zones \
+        -d '{"name": "sysa.xyz.", "kind": "Native", "nameservers": ["ns1.sysa.xyz."]}' \
+        -H "X-API-Key: secret"
+      make testacc
+    environment:
+      PDNS_SERVER_URL: http://pdns:8081
+      PDNS_API_KEY: secret
+    volumes:
+    - .:/go/src/github.com/terraform-providers/terraform-provider-powerdns
+    working_dir: /go/src/github.com/terraform-providers/terraform-provider-powerdns
+    depends_on:
+    - pdns
