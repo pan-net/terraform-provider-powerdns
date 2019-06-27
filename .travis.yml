@@ -4,7 +4,9 @@ services:
 - docker
 language: go
 go:
-- 1.8.1
+- 1.12
+env:
+- GO111MODULE=on
 
 install:
 # This script is used by the Travis build to install a cookie for
