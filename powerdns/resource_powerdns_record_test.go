@@ -297,8 +297,8 @@ resource "powerdns_record" "test-a" {
 
 const testPDNSRecordConfigAWithPtr = `
 resource "powerdns_record" "test-a-ptr" {
-	zone = "sysa.xyz"
-	name = "redis.sysa.xyz"
+	zone = "sysa.xyz."
+	name = "redis.sysa.xyz."
 	type = "A"
 	ttl = 60
 	set_ptr = true

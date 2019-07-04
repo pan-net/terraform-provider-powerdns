@@ -32,6 +32,9 @@ services:
       curl -X POST http://pdns:8081/api/v1/servers/localhost/zones \
         -d '{"name": "sysa.xyz.", "kind": "Native", "nameservers": ["ns1.sysa.xyz."]}' \
         -H "X-API-Key: secret"
+      curl -s -X POST http://pdns:8081/api/v1/servers/localhost/zones \
+        -d '{"name": "in-addr.arpa.", "kind": "Native", "nameservers": ["ns1.sysa.xyz."]}' \
+        -H "X-API-Key: secret"
       make testacc
     environment:
       PDNS_SERVER_URL: http://pdns:8081
