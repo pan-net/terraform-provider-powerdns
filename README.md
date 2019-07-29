@@ -69,14 +69,10 @@ In order to test the provider, you can simply run `make test`.
 $ make test
 ```
 
-In order to run the full suite of acceptance tests, run `make testacc`.
+You can use `docker-compose` to prepare test environment for acceptance tests:
 
 ```sh
-$ make testacc
-```
-
-You can also run acceptance tests using `docker-compose`:
-
-```sh
-docker-compose run --rm testacc
+docker-compose run --rm setup
+PDNS_SERVER_URL=http://localhost:8081 PDNS_API_KEY=secret make testacc
+docker-compose down
 ```
