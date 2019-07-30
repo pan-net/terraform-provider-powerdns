@@ -27,7 +27,7 @@ resource "powerdns_record" "foobar" {
 }
 ```
 
-For PTR record example:
+Here is an example creating PTR record:
 
 ```hcl
 # Add PTR record to the zone
@@ -40,8 +40,10 @@ resource "powerdns_record" "foobar" {
 }
 ```
 
-There is a feature in PowerDNS API for A/AAAA records to automatically create corresponding PTR records.
-Existing PTR records with same name are replaced. If no matching reverse zone found, an error is thrown by API and thus Terraform. Example:
+PowerDNS API offers the feature to automatically create corresponding PTR record for the A/AAAA record.
+Existing PTR records with same name are replaced. If no matching reverse zone is found, resource creation will fail. 
+You can use `powerdns_zone` resource to create the reverse zone.
+Here is an example of creating A record along with corresponding PTR record:
 
 ```hcl
 resource "powerdns_record" "foobar" {
