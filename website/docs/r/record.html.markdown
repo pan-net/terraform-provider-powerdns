@@ -28,6 +28,7 @@ resource "powerdns_record" "foobar" {
 ```
 
 For PTR record example:
+
 ```hcl
 # Add PTR record to the zone
 resource "powerdns_record" "foobar" {
