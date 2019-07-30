@@ -1,4 +1,12 @@
-## 0.1.1 (Unreleased)
+## 0.2.0 (Unreleased)
+
+ENHANCEMENTS:
+  * resource/powerdns_record added support for set-ptr option in [GH-4]
+  * added docker-compose tests [GH-9]
+
+FEATURES:
+  * **New resource **: `powerdns_zone` [GH-8]
+
 ## 0.1.0 (June 21, 2017)
 
 NOTES:
