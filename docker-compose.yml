@@ -17,7 +17,9 @@ services:
       MYSQL_PASS: secret
     depends_on:
     - mysql
-  testacc:
+    ports:
+    - "8081:8081"
+  setup:
     image: golang
     command:
     - sh
@@ -35,12 +37,5 @@ services:
       curl -s -X POST http://pdns:8081/api/v1/servers/localhost/zones \
         -d '{"name": "in-addr.arpa.", "kind": "Native", "nameservers": ["ns1.sysa.xyz."]}' \
         -H "X-API-Key: secret"
-      make testacc
-    environment:
-      PDNS_SERVER_URL: http://pdns:8081
-      PDNS_API_KEY: secret
-    volumes:
-    - .:/go/src/github.com/terraform-providers/terraform-provider-powerdns
-    working_dir: /go/src/github.com/terraform-providers/terraform-provider-powerdns
     depends_on:
     - pdns
