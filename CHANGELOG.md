@@ -1,3 +1,4 @@
+## 1.0.0 (Unreleased)
 ## 0.2.0 (July 31, 2019)
 
 FEATURES:
