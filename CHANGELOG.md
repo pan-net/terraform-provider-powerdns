@@ -1,7 +1,7 @@
 ## 1.0.0 (Unreleased)
 
 ENHANCEMENTS:
-  * Switch to go modules and Terraform v0.12 SDK. 
+  * Switch to go modules and Terraform v0.12 SDK [GH-16] 
 
 NOTES:
   * Due to the switching to TF v0.12 SDK, nothing else is added in this release. 
