@@ -1,4 +1,11 @@
 ## 1.0.0 (Unreleased)
+
+ENHANCEMENTS:
+  * Switch to go modules and Terraform v0.12 SDK. 
+
+NOTES:
+  * Due to the switching to TF v0.12 SDK, nothing else is added in this release. 
+  
 ## 0.2.0 (July 31, 2019)
 
 FEATURES:
