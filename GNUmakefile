@@ -3,6 +3,9 @@ GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 PKG_NAME=powerdns
 
+.EXPORT_ALL_VARIABLES:
+GOFLAGS=-mod=vendor
+
 default: build
 
 build: fmtcheck
@@ -34,9 +37,6 @@ fmtcheck:
 errcheck:
 	@sh -c "'$(CURDIR)/scripts/errcheck.sh'"
 
-vendor-status:
-	@govendor status
-
 test-compile:
 	@if [ "$(TEST)" = "./..." ]; then \
 		echo "ERROR: Set TEST to a specific package. For example,"; \
@@ -59,5 +59,5 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
-.PHONY: build test testacc vet fmt fmtcheck errcheck vendor-status test-compile website website-test
+.PHONY: build test testacc vet fmt fmtcheck errcheck test-compile website website-test
 
