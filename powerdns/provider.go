@@ -20,6 +20,12 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("PDNS_SERVER_URL", nil),
 				Description: "Location of PowerDNS server",
 			},
+			"skip_tls_verify": {
+				Type:        schema.TypeBool,
+				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("PDNS_SKIP_TLS_VERIFY", false),
+				Description: "Disable verification of the PowerDNS server's TLS certificate",
+			},
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -33,8 +39,9 @@ func Provider() terraform.ResourceProvider {
 
 func providerConfigure(data *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		ApiKey:    data.Get("api_key").(string),
-		ServerUrl: data.Get("server_url").(string),
+		ApiKey:        data.Get("api_key").(string),
+		ServerUrl:     data.Get("server_url").(string),
+		SkipTLSVerify: data.Get("skip_tls_verify").(bool),
 	}
 
 	return config.Client()

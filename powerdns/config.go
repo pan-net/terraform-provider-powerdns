@@ -6,13 +6,14 @@ import (
 )
 
 type Config struct {
-	ServerUrl string
-	ApiKey    string
+	ServerUrl     string
+	ApiKey        string
+	SkipTLSVerify bool
 }
 
 // Client returns a new client for accessing PowerDNS
 func (c *Config) Client() (*Client, error) {
-	client, err := NewClient(c.ServerUrl, c.ApiKey)
+	client, err := NewClient(c.ServerUrl, c.ApiKey, c.SkipTLSVerify)
 
 	if err != nil {
 		return nil, fmt.Errorf("Error setting up PowerDNS client: %s", err)

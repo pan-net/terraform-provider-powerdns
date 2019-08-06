@@ -2,6 +2,7 @@ package powerdns
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -21,11 +22,15 @@ type Client struct {
 }
 
 // NewClient returns a new PowerDNS client
-func NewClient(serverUrl string, apiKey string) (*Client, error) {
+func NewClient(serverUrl string, apiKey string, skipTLSVerify bool) (*Client, error) {
+	httpClient := cleanhttp.DefaultClient()
+	httpClient.Transport.(*http.Transport).TLSClientConfig = &tls.Config{
+		InsecureSkipVerify: skipTLSVerify,
+	}
 	client := Client{
 		ServerUrl:  serverUrl,
 		ApiKey:     apiKey,
-		Http:       cleanhttp.DefaultClient(),
+		Http:       httpClient,
 		ApiVersion: -1,
 	}
 
