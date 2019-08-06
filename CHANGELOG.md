@@ -1,10 +1,10 @@
 ## 1.0.0 (Unreleased)
 
+NOTES:
+ * provider: This release includes only a Terraform SDK upgrade with compatibility for Terraform v0.12. The provider remains backwards compatible with Terraform v0.11 and this update should have no significant changes in behavior for the provider. Please report any unexpected behavior in new GitHub issues (Terraform core: https://github.com/hashicorp/terraform/issues or Terraform PowerDNS Provider: https://github.com/terraform-providers/terraform-provider-powerdns/issues) [GH-16]
+
 ENHANCEMENTS:
   * Switch to go modules and Terraform v0.12 SDK [GH-16] 
-
-NOTES:
-  * Due to the switching to TF v0.12 SDK, nothing else is added in this release. 
   
 ## 0.2.0 (July 31, 2019)
 
