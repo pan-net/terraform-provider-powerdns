@@ -1,17 +1,18 @@
 version: "3"
 services:
   mysql:
-    image: mariadb
+    image: mariadb:10.4.7-bionic
     environment:
       MYSQL_ROOT_PASSWORD: secret
   pdns:
-    image: psitrax/powerdns
+    image: psitrax/powerdns:4.1.10
     command:
     - "--api"
     - "--api-key=secret"
     - "--webserver"
     - "--webserver-address=0.0.0.0"
     - "--webserver-allow-from=0.0.0.0/0"
+    - "--loglevel=10"
     environment:
       MYSQL_USER: root
       MYSQL_PASS: secret
@@ -20,11 +21,12 @@ services:
     ports:
     - "8081:8081"
   setup:
-    image: golang
+    image: alpine:3.9
     command:
     - sh
     - -c
     - |
+      apk add --no-cache curl &&
       while true; do
         if curl -f http://pdns:8081/api -H "X-API-Key: secret"; then
           break
