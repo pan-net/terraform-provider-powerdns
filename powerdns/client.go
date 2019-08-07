@@ -23,20 +23,26 @@ type Client struct {
 // NewClient returns a new PowerDNS client
 func NewClient(serverUrl string, apiKey string) (*Client, error) {
 	client := Client{
-		ServerUrl: serverUrl,
-		ApiKey:    apiKey,
-		Http:      cleanhttp.DefaultClient(),
+		ServerUrl:  serverUrl,
+		ApiKey:     apiKey,
+		Http:       cleanhttp.DefaultClient(),
+		ApiVersion: -1,
 	}
-	var err error
-	client.ApiVersion, err = client.detectApiVersion()
-	if err != nil {
-		return nil, err
-	}
+
 	return &client, nil
 }
 
 // Creates a new request with necessary headers
 func (c *Client) newRequest(method string, endpoint string, body []byte) (*http.Request, error) {
+
+	var err error
+	if c.ApiVersion < 0 {
+		c.ApiVersion, err = c.detectApiVersion()
+	}
+
+	if err != nil {
+		return nil, err
+	}
 
 	var urlStr string
 	if c.ApiVersion > 0 {
@@ -129,14 +135,27 @@ func parseId(recId string) (string, string, error) {
 // Uses int to represent the API version: 0 is the legacy AKA version 3.4 API
 // Any other integer correlates with the same API version
 func (client *Client) detectApiVersion() (int, error) {
-	req, err := client.newRequest("GET", "/api/v1/servers", nil)
+
+	http_client := &http.Client{}
+
+	url, err := url.Parse(client.ServerUrl + "/api/v1/servers")
+	if err != nil {
+		return -1, fmt.Errorf("Error while trying to detect the API version, request URL: %s", err)
+	}
+
+	req, err := http.NewRequest("GET", url.String(), nil)
+	if err != nil {
+		return -1, fmt.Errorf("Error during creation of request: %s", err)
+	}
+
+	req.Header.Add("X-API-Key", client.ApiKey)
+	req.Header.Add("Accept", "application/json")
+
+	resp, err := http_client.Do(req)
 	if err != nil {
 		return -1, err
 	}
-	resp, err := client.Http.Do(req)
-	if err != nil {
-		return -1, err
-	}
+
 	defer resp.Body.Close()
 	if resp.StatusCode == 200 {
 		return 1, nil
