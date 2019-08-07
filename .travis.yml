@@ -19,6 +19,9 @@ script:
 - make test
 - make vet
 - make website-test
+- docker-compose run --rm setup
+- PDNS_SERVER_URL=http://localhost:8081 PDNS_API_KEY=secret make testacc
+- docker-compose down
 
 branches:
   only:
