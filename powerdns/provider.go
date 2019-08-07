@@ -22,7 +22,7 @@ func Provider() terraform.ResourceProvider {
 			},
 			"skip_tls_verify": {
 				Type:        schema.TypeBool,
-				Required:    true,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("PDNS_SKIP_TLS_VERIFY", false),
 				Description: "Disable verification of the PowerDNS server's TLS certificate",
 			},
