@@ -33,5 +33,5 @@ resource "powerdns_record" "www" {
 The following arguments are supported:
 
 * `api_key` - (Required) The PowerDNS API key. This can also be specified with `PDNS_API_KEY` environment variable.
-* `server_url` - (Required) The address of PowerDNS server. This can also be specified with `PDNS_SERVER_URL` environment variable.
+* `server_url` - (Required) The address of PowerDNS server. This can also be specified with `PDNS_SERVER_URL` environment variable. When no schema is provided, the default is `https`.
 * `skip_tls_verify` - (Optional) Set this to `true` to disable verification of the PowerDNS server's TLS certificate. This can also be specified with the `PDNS_SKIP_TLS_VERIFY` environment variable.
