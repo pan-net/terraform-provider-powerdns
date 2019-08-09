@@ -10,8 +10,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/go-cleanhttp"
+	cleanhttp "github.com/hashicorp/go-cleanhttp"
 )
+
+// DefaultSchema is the value used for the URL in case
+// no schema is explicitly defined
+var DefaultSchema = "https"
 
 type Client struct {
 	ServerUrl  string // Location of PowerDNS server to use
@@ -22,14 +26,74 @@ type Client struct {
 
 // NewClient returns a new PowerDNS client
 func NewClient(serverUrl string, apiKey string) (*Client, error) {
+	cleanURL, err := sanitizeURL(serverUrl)
+
+	if err != nil {
+		return nil, fmt.Errorf("Error while creating client: %s", err)
+	}
+
 	client := Client{
-		ServerUrl:  serverUrl,
+		ServerUrl:  cleanURL,
 		ApiKey:     apiKey,
 		Http:       cleanhttp.DefaultClient(),
 		ApiVersion: -1,
 	}
 
 	return &client, nil
+}
+
+// sanitizeURL will output:
+// <scheme>://<host>[:port]
+// with no trailing /
+// For details on the implementation be familiar with the behavior or url.Parse
+// specifically: https://go-review.googlesource.com/c/go/+/81436/
+func sanitizeURL(URL string) (string, error) {
+	cleanURL := ""
+	host := ""
+	schema := ""
+
+	var err error
+
+	if len(URL) == 0 {
+		return "", fmt.Errorf("No URL provided")
+	}
+
+	parsedURL, err := url.Parse(URL)
+
+	if err != nil {
+		return "", fmt.Errorf("Error while trying to parse URL: %s", err)
+	}
+
+	if len(parsedURL.Scheme) == 0 {
+		schema = DefaultSchema
+	} else {
+		// this is necessary because when using `<host>:<port>` (without schema)
+		// url.Parse will contain Scheme = host.
+		if (parsedURL.Scheme == "http") || (parsedURL.Scheme == "https") {
+			schema = parsedURL.Scheme
+		} else {
+			schema = DefaultSchema
+		}
+	}
+
+	if len(parsedURL.Host) == 0 {
+		// url.Parse will return an empty host when the value passed
+		// contains no schema, so we add a default schema and force parsing
+		tryout, _ := url.Parse(schema + "://" + URL)
+
+		if len(tryout.Host) == 0 {
+			return "", fmt.Errorf("Unable to find a hostname in '%s'", URL)
+		}
+
+		host = tryout.Host
+
+	} else {
+		host = parsedURL.Host
+	}
+
+	cleanURL = schema + "://" + host
+
+	return cleanURL, nil
 }
 
 // Creates a new request with necessary headers
