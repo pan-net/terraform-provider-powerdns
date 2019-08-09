@@ -1,6 +1,7 @@
 package powerdns
 
 import (
+	"crypto/tls"
 	"strings"
 	"testing"
 
@@ -8,6 +9,7 @@ import (
 )
 
 var (
+	tlsConfig                               = &tls.Config{}
 	URLMissingSchemaAndNotEndingWithSlash   = "powerdnsapi.com"
 	URLMissingSchemaAndEndingWithSlash      = "powerdnsapi.com/"
 	URLWithSchemaAndEndingWithSlash         = "http://powerdnsapi.com/"
@@ -21,7 +23,7 @@ var (
 
 func TestURLMissingSchema(t *testing.T) {
 	client, err := NewClient(URLMissingSchemaAndNotEndingWithSlash,
-		"secretapikey", true)
+		"secretapikey", tlsConfig)
 	assert.NoError(t, err)
 
 	expectedURL := DefaultSchema + "://" + URLMissingSchemaAndNotEndingWithSlash
@@ -32,7 +34,7 @@ func TestURLMissingSchema(t *testing.T) {
 
 func TestURLMissingSchemaAndEndingWithSlash(t *testing.T) {
 	client, err := NewClient(URLMissingSchemaAndEndingWithSlash,
-		"secretapikey", true)
+		"secretapikey", tlsConfig)
 	assert.NoError(t, err)
 
 	expectedURL := DefaultSchema + "://" +
@@ -44,7 +46,7 @@ func TestURLMissingSchemaAndEndingWithSlash(t *testing.T) {
 
 func TestURLWithSchemaAndEndingWithSlash(t *testing.T) {
 	client, err := NewClient(URLWithSchemaAndEndingWithSlash,
-		"secretapikey", true)
+		"secretapikey", tlsConfig)
 	assert.NoError(t, err)
 
 	expectedURL := strings.TrimSuffix(URLWithSchemaAndEndingWithSlash, "/")
@@ -55,7 +57,7 @@ func TestURLWithSchemaAndEndingWithSlash(t *testing.T) {
 
 func TestURLWithSchemaAndNotEndingWithSlash(t *testing.T) {
 	client, err := NewClient(URLWithSchemaAndNotEndingWithSlash,
-		"secretapikey", true)
+		"secretapikey", tlsConfig)
 	assert.NoError(t, err)
 
 	expectedURL := URLWithSchemaAndNotEndingWithSlash
@@ -65,7 +67,7 @@ func TestURLWithSchemaAndNotEndingWithSlash(t *testing.T) {
 }
 
 func TestURLMissingSchemaHasPort(t *testing.T) {
-	client, err := NewClient(URLMissingSchemaHasPort, "secretapikey", true)
+	client, err := NewClient(URLMissingSchemaHasPort, "secretapikey", tlsConfig)
 	assert.NoError(t, err)
 
 	expectedURL := DefaultSchema + "://" + URLMissingSchemaHasPort
@@ -76,7 +78,7 @@ func TestURLMissingSchemaHasPort(t *testing.T) {
 
 func TestURLMissingSchemaHasPortAndEndsWithSlash(t *testing.T) {
 	client, err := NewClient(URLMissingSchemaHasPortAndEndsWithSlash,
-		"secretapikey", true)
+		"secretapikey", tlsConfig)
 	assert.NoError(t, err)
 
 	expectedURL := DefaultSchema + "://" +
@@ -88,7 +90,7 @@ func TestURLMissingSchemaHasPortAndEndsWithSlash(t *testing.T) {
 
 func TestURLWithSchemaHasPort(t *testing.T) {
 	client, err := NewClient(URLWithSchemaHasPort,
-		"secretapikey", true)
+		"secretapikey", tlsConfig)
 	assert.NoError(t, err)
 
 	expectedURL := URLWithSchemaHasPort
@@ -99,7 +101,7 @@ func TestURLWithSchemaHasPort(t *testing.T) {
 
 func TestURLWithSchemaHasPortAndEndsWithSlash(t *testing.T) {
 	client, err := NewClient(URLWithSchemaHasPortAndEndsWithSlash,
-		"secretapikey", true)
+		"secretapikey", tlsConfig)
 	assert.NoError(t, err)
 
 	expectedURL := strings.TrimSuffix(URLWithSchemaHasPortAndEndsWithSlash, "/")

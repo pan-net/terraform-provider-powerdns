@@ -54,7 +54,7 @@ In order to run local provider tests, you can simply run `make test`.
 $ make test
 ```
 
-For running acceptance tests locally, you need to use `docker-compose` to prepare the test environment: 
+For running acceptance tests locally, you need to use `docker-compose` to prepare the test environment:
 
 ```sh
 docker-compose run --rm setup
