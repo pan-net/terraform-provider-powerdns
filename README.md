@@ -54,7 +54,7 @@ In order to run local provider tests, you can simply run `make test`.
 $ make test
 ```
 
-For running acceptance tests locally, you need to use `docker-compose` to prepare the test environment: 
+For running acceptance tests locally, you need to use `docker-compose` to prepare the test environment:
 
 ```sh
 docker-compose run --rm setup
@@ -62,9 +62,23 @@ docker-compose run --rm setup
 
 After setup is done, run the acceptance tests with `make testacc` (note the env variables needed to interact with the PowerDNS container)
 
+* HTTP
+
 ```sh
-~$ PDNS_SERVER_URL=http://localhost:8081 PDNS_API_KEY=secret make testacc
+~$  PDNS_SERVER_URL=http://localhost:8081 \
+    PDNS_API_KEY=secret \
+    make testacc
 ````
+
+* HTTPS
+
+```sh
+~$  PDNS_SERVER_URL=localhost:4443 \
+    PDNS_API_KEY=secret \
+    PDNS_CACERT=$(cat $PWD/tests/files/ssl/rootCA/rootCA.crt) \
+    make testacc
+````
+
 
 And finally cleanup containers spun up by `docker-compose`:
 

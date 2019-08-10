@@ -34,3 +34,5 @@ The following arguments are supported:
 
 * `api_key` - (Required) The PowerDNS API key. This can also be specified with `PDNS_API_KEY` environment variable.
 * `server_url` - (Required) The address of PowerDNS server. This can also be specified with `PDNS_SERVER_URL` environment variable. When no schema is provided, the default is `https`.
+* `ca_certificate` - (Optional) A valid path of a Root CA Certificate in PEM format _or_ the content of a Root CA certificate in PEM format. This can also be specified with `PDNS_CACERT` environment variable.
+* `insecure_https` - (Optional) Set this to `true` to disable verification of the PowerDNS server's TLS certificate. This can also be specified with the `PDNS_INSECURE_HTTPS` environment variable.

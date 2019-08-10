@@ -20,7 +20,10 @@ script:
 - make vet
 - make website-test
 - docker-compose run --rm setup
-- PDNS_SERVER_URL=http://localhost:8081 PDNS_API_KEY=secret make testacc
+# run test using custom root CA
+- PDNS_SERVER_URL=localhost:4443 PDNS_API_KEY=secret PDNS_CACERT="$PWD/tests/files/ssl/rootCA/rootCA.crt" make testacc
+# run test skipping TLS verification (Insecure HTTPS)
+- PDNS_SERVER_URL=localhost:4443 PDNS_API_KEY=secret PDNS_INSECURE_HTTPS=true make testacc
 - docker-compose down
 
 branches:

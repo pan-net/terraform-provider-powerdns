@@ -2,6 +2,7 @@ package powerdns
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -25,8 +26,12 @@ type Client struct {
 }
 
 // NewClient returns a new PowerDNS client
-func NewClient(serverUrl string, apiKey string) (*Client, error) {
+func NewClient(serverUrl string, apiKey string, configTLS *tls.Config) (*Client, error) {
+
 	cleanURL, err := sanitizeURL(serverUrl)
+
+	httpClient := cleanhttp.DefaultClient()
+	httpClient.Transport.(*http.Transport).TLSClientConfig = configTLS
 
 	if err != nil {
 		return nil, fmt.Errorf("Error while creating client: %s", err)
@@ -35,7 +40,7 @@ func NewClient(serverUrl string, apiKey string) (*Client, error) {
 	client := Client{
 		ServerUrl:  cleanURL,
 		ApiKey:     apiKey,
-		Http:       cleanhttp.DefaultClient(),
+		Http:       httpClient,
 		ApiVersion: -1,
 	}
 
@@ -200,7 +205,7 @@ func parseId(recId string) (string, string, error) {
 // Any other integer correlates with the same API version
 func (client *Client) detectApiVersion() (int, error) {
 
-	http_client := &http.Client{}
+	http_client := client.Http
 
 	url, err := url.Parse(client.ServerUrl + "/api/v1/servers")
 	if err != nil {
