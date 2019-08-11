@@ -278,7 +278,7 @@ func testAccCheckPDNSRecordExists(n string) resource.TestCheckFunc {
 			return fmt.Errorf("Record does not exist")
 		}
 		for _, rec := range foundRecords {
-			if rec.Id() == rs.Primary.ID {
+			if rec.ID() == rs.Primary.ID {
 				return nil
 			}
 		}

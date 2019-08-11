@@ -28,8 +28,8 @@ func TestURLMissingSchema(t *testing.T) {
 
 	expectedURL := DefaultSchema + "://" + URLMissingSchemaAndNotEndingWithSlash
 
-	assert.Equal(t, client.ServerUrl, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerUrl+"'")
+	assert.Equal(t, client.ServerURL, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
 }
 
 func TestURLMissingSchemaAndEndingWithSlash(t *testing.T) {
@@ -40,8 +40,8 @@ func TestURLMissingSchemaAndEndingWithSlash(t *testing.T) {
 	expectedURL := DefaultSchema + "://" +
 		strings.TrimSuffix(URLMissingSchemaAndEndingWithSlash, "/")
 
-	assert.Equal(t, client.ServerUrl, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerUrl+"'")
+	assert.Equal(t, client.ServerURL, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
 }
 
 func TestURLWithSchemaAndEndingWithSlash(t *testing.T) {
@@ -51,8 +51,8 @@ func TestURLWithSchemaAndEndingWithSlash(t *testing.T) {
 
 	expectedURL := strings.TrimSuffix(URLWithSchemaAndEndingWithSlash, "/")
 
-	assert.Equal(t, client.ServerUrl, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerUrl+"'")
+	assert.Equal(t, client.ServerURL, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
 }
 
 func TestURLWithSchemaAndNotEndingWithSlash(t *testing.T) {
@@ -62,8 +62,8 @@ func TestURLWithSchemaAndNotEndingWithSlash(t *testing.T) {
 
 	expectedURL := URLWithSchemaAndNotEndingWithSlash
 
-	assert.Equal(t, client.ServerUrl, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerUrl+"'")
+	assert.Equal(t, client.ServerURL, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
 }
 
 func TestURLMissingSchemaHasPort(t *testing.T) {
@@ -72,8 +72,8 @@ func TestURLMissingSchemaHasPort(t *testing.T) {
 
 	expectedURL := DefaultSchema + "://" + URLMissingSchemaHasPort
 
-	assert.Equal(t, client.ServerUrl, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerUrl+"'")
+	assert.Equal(t, client.ServerURL, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
 }
 
 func TestURLMissingSchemaHasPortAndEndsWithSlash(t *testing.T) {
@@ -84,8 +84,8 @@ func TestURLMissingSchemaHasPortAndEndsWithSlash(t *testing.T) {
 	expectedURL := DefaultSchema + "://" +
 		strings.TrimSuffix(URLMissingSchemaHasPortAndEndsWithSlash, "/")
 
-	assert.Equal(t, client.ServerUrl, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerUrl+"'")
+	assert.Equal(t, client.ServerURL, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
 }
 
 func TestURLWithSchemaHasPort(t *testing.T) {
@@ -95,8 +95,8 @@ func TestURLWithSchemaHasPort(t *testing.T) {
 
 	expectedURL := URLWithSchemaHasPort
 
-	assert.Equal(t, client.ServerUrl, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerUrl+"'")
+	assert.Equal(t, client.ServerURL, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
 }
 
 func TestURLWithSchemaHasPortAndEndsWithSlash(t *testing.T) {
@@ -106,6 +106,6 @@ func TestURLWithSchemaHasPortAndEndsWithSlash(t *testing.T) {
 
 	expectedURL := strings.TrimSuffix(URLWithSchemaHasPortAndEndsWithSlash, "/")
 
-	assert.Equal(t, client.ServerUrl, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerUrl+"'")
+	assert.Equal(t, client.ServerURL, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
 }

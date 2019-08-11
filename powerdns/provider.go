@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
+// Provider returns a schema.Provider for PowerDNS.
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
@@ -45,8 +46,8 @@ func Provider() terraform.ResourceProvider {
 
 func providerConfigure(data *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		ApiKey:        data.Get("api_key").(string),
-		ServerUrl:     data.Get("server_url").(string),
+		APIKey:        data.Get("api_key").(string),
+		ServerURL:     data.Get("server_url").(string),
 		InsecureHTTPS: data.Get("insecure_https").(bool),
 		CACertificate: data.Get("ca_certificate").(string),
 	}

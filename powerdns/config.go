@@ -9,9 +9,10 @@ import (
 	"github.com/hashicorp/terraform/helper/pathorcontents"
 )
 
+// Config describes de configuration interface of this provider
 type Config struct {
-	ServerUrl     string
-	ApiKey        string
+	ServerURL     string
+	APIKey        string
 	InsecureHTTPS bool
 	CACertificate string
 }
@@ -35,13 +36,13 @@ func (c *Config) Client() (*Client, error) {
 
 	tlsConfig.InsecureSkipVerify = c.InsecureHTTPS
 
-	client, err := NewClient(c.ServerUrl, c.ApiKey, tlsConfig)
+	client, err := NewClient(c.ServerURL, c.APIKey, tlsConfig)
 
 	if err != nil {
 		return nil, fmt.Errorf("Error setting up PowerDNS client: %s", err)
 	}
 
-	log.Printf("[INFO] PowerDNS Client configured for server %s", c.ServerUrl)
+	log.Printf("[INFO] PowerDNS Client configured for server %s", c.ServerURL)
 
 	return client, nil
 }

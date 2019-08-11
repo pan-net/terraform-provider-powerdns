@@ -56,7 +56,7 @@ func resourcePDNSZoneCreate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	d.SetId(createdZoneInfo.Id)
+	d.SetId(createdZoneInfo.ID)
 
 	return nil
 }
