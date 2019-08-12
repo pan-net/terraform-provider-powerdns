@@ -1,4 +1,13 @@
-## 1.0.1 (Unreleased)
+## 1.1.0 (Unreleased)
+
+FEATURES: 
+  * **HTTPS Custom CA**: added option for custom Root CA for HTTPS Certificate validation (option `ca_certificate`) [GH-22]
+  * **HTTPS**: added option to skip HTTPS certificate validation - insecure HTTPS (option `insecure_https`) [GH-22]
+
+ENHANCEMENTS:
+  * The provider doesn't attempt to connect to the PowerDNS endpoint if there is nothing to be done [GH-24]
+  * `server_url` (`PDNS_SERVER_URL`) can now be declared with/without scheme, port, trailing slashes or path [GH-28]
+
 ## 1.0.0 (August 06, 2019)
 
 NOTES:
