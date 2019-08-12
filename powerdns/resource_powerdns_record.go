@@ -69,26 +69,26 @@ func resourcePDNSRecordCreate(d *schema.ResourceData, meta interface{}) error {
 	zone := d.Get("zone").(string)
 	ttl := d.Get("ttl").(int)
 	recs := d.Get("records").(*schema.Set).List()
-	set_ptr := false
+	setPtr := false
 	if v, ok := d.GetOk("set_ptr"); ok {
-		set_ptr = v.(bool)
+		setPtr = v.(bool)
 	}
 
 	if len(recs) > 0 {
 		records := make([]Record, 0, len(recs))
 		for _, recContent := range recs {
-			records = append(records, Record{Name: rrSet.Name, Type: rrSet.Type, TTL: ttl, Content: recContent.(string), SetPtr: set_ptr})
+			records = append(records, Record{Name: rrSet.Name, Type: rrSet.Type, TTL: ttl, Content: recContent.(string), SetPtr: setPtr})
 		}
 		rrSet.Records = records
 
 		log.Printf("[DEBUG] Creating PowerDNS Record: %#v", rrSet)
 
-		recId, err := client.ReplaceRecordSet(zone, rrSet)
+		recID, err := client.ReplaceRecordSet(zone, rrSet)
 		if err != nil {
 			return fmt.Errorf("Failed to create PowerDNS Record: %s", err)
 		}
 
-		d.SetId(recId)
+		d.SetId(recID)
 		log.Printf("[INFO] Created PowerDNS Record with ID: %s", d.Id())
 
 	} else {
@@ -98,7 +98,7 @@ func resourcePDNSRecordCreate(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("Failed to delete PowerDNS Record: %s", err)
 		}
 
-		d.SetId(rrSet.Id())
+		d.SetId(rrSet.ID())
 	}
 
 	return resourcePDNSRecordRead(d, meta)

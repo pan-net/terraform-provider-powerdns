@@ -28,6 +28,10 @@ vet:
 		exit 1; \
 	fi
 
+lint:
+	GO111MODULE=off GOFLAGS="" go get -u golang.org/x/lint/golint
+	GO111MODULE=off GOFLAGS="" golint -set_exit_status $(PKG_NAME)/
+
 fmt:
 	gofmt -w $(GOFMT_FILES)
 

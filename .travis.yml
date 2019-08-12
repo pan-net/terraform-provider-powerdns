@@ -6,16 +6,18 @@ language: go
 go:
 - 1.12
 env:
-- GO111MODULE=on
+  global:
+  - GO111MODULE=on
 
-install:
-# This script is used by the Travis build to install a cookie for
-# go.googlesource.com so rate limits are higher when using `go get` to fetch
-# packages that live there.
-# See: https://github.com/golang/go/issues/12933
-- bash scripts/gogetcookie.sh
+# install:
+# # This script is used by the Travis build to install a cookie for
+# # go.googlesource.com so rate limits are higher when using `go get` to fetch
+# # packages that live there.
+# # See: https://github.com/golang/go/issues/12933
+# - bash scripts/gogetcookie.sh
 
 script:
+- make lint
 - make test
 - make vet
 - make website-test
