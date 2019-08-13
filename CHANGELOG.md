@@ -1,12 +1,12 @@
-## 1.1.0 (Unreleased)
+## 1.1.0 (August 13, 2019)
 
 FEATURES: 
-  * **HTTPS Custom CA**: added option for custom Root CA for HTTPS Certificate validation (option `ca_certificate`) [GH-22]
-  * **HTTPS**: added option to skip HTTPS certificate validation - insecure HTTPS (option `insecure_https`) [GH-22]
+  * **HTTPS Custom CA**: added option for custom Root CA for HTTPS Certificate validation (option `ca_certificate`) ([#22](https://github.com/terraform-providers/terraform-provider-powerdns/issues/22))
+  * **HTTPS**: added option to skip HTTPS certificate validation - insecure HTTPS (option `insecure_https`) ([#22](https://github.com/terraform-providers/terraform-provider-powerdns/issues/22))
 
 ENHANCEMENTS:
-  * The provider doesn't attempt to connect to the PowerDNS endpoint if there is nothing to be done [GH-24]
-  * `server_url` (`PDNS_SERVER_URL`) can now be declared with/without scheme, port, trailing slashes or path [GH-28]
+  * The provider doesn't attempt to connect to the PowerDNS endpoint if there is nothing to be done ([#24](https://github.com/terraform-providers/terraform-provider-powerdns/issues/24))
+  * `server_url` (`PDNS_SERVER_URL`) can now be declared with/without scheme, port, trailing slashes or path ([#28](https://github.com/terraform-providers/terraform-provider-powerdns/issues/28))
 
 ## 1.0.0 (August 06, 2019)
 
