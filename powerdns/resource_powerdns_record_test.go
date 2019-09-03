@@ -239,6 +239,22 @@ func TestAccPDNSRecord_TXT(t *testing.T) {
 	})
 }
 
+func TestAccPDNSRecord_SOA(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSRecordDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSRecordConfigSOA,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSRecordExists("powerdns_record.test-soa"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckPDNSRecordDestroy(s *terraform.State) error {
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "powerdns_record" {
@@ -421,4 +437,13 @@ resource "powerdns_record" "test-txt" {
 	type = "TXT"
 	ttl = 60
 	records = [ "\"text record payload\"" ]
+}`
+
+const testPDNSRecordConfigSOA = `
+resource "powerdns_record" "test-soa" {
+	zone = "sysa.xyz."
+	name = "sysa.xyz."
+	type = "SOA"
+	ttl = 3600
+	records = [ "something.something. hostmaster.sysa.xyz. 2019090301 10800 3600 604800 3600" ]
 }`
