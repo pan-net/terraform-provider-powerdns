@@ -9,6 +9,8 @@ import (
 )
 
 func TestAccPDNSZone(t *testing.T) {
+	resourceName := "powerdns_zone.test"
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -17,10 +19,15 @@ func TestAccPDNSZone(t *testing.T) {
 			{
 				Config: testPDNSZoneConfig,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSZoneExists("powerdns_zone.test"),
+					testAccCheckPDNSZoneExists(resourceName),
 					resource.TestCheckResourceAttr("powerdns_zone.test", "name", "sysa.abc."),
 					resource.TestCheckResourceAttr("powerdns_zone.test", "kind", "Native"),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})

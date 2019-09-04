@@ -1,8 +1,8 @@
 package powerdns
 
 import (
-	"encoding/json"
-	"errors"
+	//"encoding/json"
+	//"errors"
 	"fmt"
 	"log"
 
@@ -17,7 +17,7 @@ func resourcePDNSZone() *schema.Resource {
 		Delete: resourcePDNSZoneDelete,
 		Exists: resourcePDNSZoneExists,
 		Importer: &schema.ResourceImporter{
-			State: resourcePDNSZoneImport,
+			State: schema.ImportStatePassthrough,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -70,13 +70,24 @@ func resourcePDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*Client)
 
 	log.Printf("[DEBUG] Reading PowerDNS Zone: %s", d.Id())
-	zoneInfo, err := client.GetZone(d.Get("name").(string))
+	zoneInfo, err := client.GetZone(d.Id())
 	if err != nil {
 		return fmt.Errorf("Couldn't fetch PowerDNS Zone: %s", err)
 	}
 
+	nameservers, err := client.ListRecordsInRRSet(zoneInfo.Name, zoneInfo.Name, "NS")
+	if err != nil {
+		return fmt.Errorf("couldn't fetch zone %s nameservers from PowerDNS: %v", zoneInfo.Name, err)
+	}
+
+	var zoneNameservers []string
+	for _, nameserver := range nameservers {
+		zoneNameservers = append(zoneNameservers, nameserver.Content)
+	}
+
 	d.Set("name", zoneInfo.Name)
 	d.Set("kind", zoneInfo.Kind)
+	d.Set("nameservers", zoneNameservers)
 
 	return nil
 }
@@ -112,54 +123,13 @@ func resourcePDNSZoneDelete(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourcePDNSZoneExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	name := d.Get("name").(string)
-
-	log.Printf("[INFO] Checking existence of PowerDNS Zone: %s", name)
+	log.Printf("[INFO] Checking existence of PowerDNS Zone: %s", d.Id())
 
 	client := meta.(*Client)
-	exists, err := client.ZoneExists(name)
+	exists, err := client.ZoneExists(d.Id())
 
 	if err != nil {
 		return false, fmt.Errorf("Error checking PowerDNS Zone: %s", err)
 	}
 	return exists, nil
-}
-
-func resourcePDNSZoneImport(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-
-	client := meta.(*Client)
-
-	var data map[string]string
-	if err := json.Unmarshal([]byte(d.Id()), &data); err != nil {
-		return nil, err
-	}
-
-	zoneName, ok := data["name"]
-	if !ok {
-		return nil, errors.New("missing zone name in input data")
-	}
-
-	log.Printf("[INFO] importing PowerDNS Zone: %s", zoneName)
-
-	zone, err := client.GetZone(zoneName)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't fetch zone %s from PowerDNS: %v", zoneName, err)
-	}
-
-	nameservers, err := client.ListRecordsInRRSet(zoneName, zoneName, "NS")
-	if err != nil {
-		return nil, fmt.Errorf("couldn't fetch zone %s nameservers from PowerDNS: %v", zoneName, err)
-	}
-
-	var zoneNameservers []string
-	for _, nameserver := range nameservers {
-		zoneNameservers = append(zoneNameservers, nameserver.Content)
-	}
-
-	d.Set("name", zone.Name)
-	d.Set("kind", zone.Kind)
-	d.Set("nameservers", zoneNameservers)
-	d.SetId(zoneName)
-
-	return []*schema.ResourceData{d}, nil
 }
