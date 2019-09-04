@@ -1,6 +1,8 @@
 package powerdns
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 
@@ -13,6 +15,9 @@ func resourcePDNSRecord() *schema.Resource {
 		Read:   resourcePDNSRecordRead,
 		Delete: resourcePDNSRecordDelete,
 		Exists: resourcePDNSRecordExists,
+		Importer: &schema.ResourceImporter{
+			State: resourcePDNSRecordImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"zone": {
@@ -153,4 +158,48 @@ func resourcePDNSRecordExists(d *schema.ResourceData, meta interface{}) (bool, e
 		return false, fmt.Errorf("Error checking PowerDNS Record: %s", err)
 	}
 	return exists, nil
+}
+
+func resourcePDNSRecordImport(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+
+	client := meta.(*Client)
+
+	var data map[string]string
+	if err := json.Unmarshal([]byte(d.Id()), &data); err != nil {
+		return nil, err
+	}
+
+	zoneName, ok := data["zone"]
+	if !ok {
+		return nil, errors.New("missing zone name in input data")
+	}
+
+	recordID, ok := data["id"]
+	if !ok {
+		return nil, errors.New("missing record id in input data")
+	}
+
+	log.Printf("[INFO] importing PowerDNS Record %s in Zone: %s", recordID, zoneName)
+
+	records, err := client.ListRecordsByID(zoneName, recordID)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't fetch PowerDNS Record: %s", err)
+	}
+
+	if len(records) == 0 {
+		return nil, errors.New("rrset has no records to import")
+	}
+
+	recs := make([]string, 0, len(records))
+	for _, r := range records {
+		recs = append(recs, r.Content)
+	}
+	d.Set("zone", zoneName)
+	d.Set("name", records[0].Name)
+	d.Set("ttl", records[0].TTL)
+	d.Set("type", records[0].Type)
+	d.Set("records", recs)
+	d.SetId(recordID)
+
+	return []*schema.ResourceData{d}, nil
 }
