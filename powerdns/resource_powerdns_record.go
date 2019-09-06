@@ -194,6 +194,7 @@ func resourcePDNSRecordImport(d *schema.ResourceData, meta interface{}) ([]*sche
 	for _, r := range records {
 		recs = append(recs, r.Content)
 	}
+
 	d.Set("zone", zoneName)
 	d.Set("name", records[0].Name)
 	d.Set("ttl", records[0].TTL)
