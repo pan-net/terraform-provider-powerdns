@@ -3,6 +3,7 @@ package powerdns
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -79,6 +80,11 @@ func resourcePDNSRecordCreate(d *schema.ResourceData, meta interface{}) error {
 	// "ValidateFunc is not yet supported on lists or sets"
 	// when terraform will support ValidateFunc for non-primitives
 	// we can move this block there
+	for _, recs := range recs {
+		if len(strings.Trim(recs.(string), " ")) == 0 {
+			log.Printf("[WARN] One or more values in 'records' contain empty '' value(s)")
+		}
+	}
 	if !(len(recs) > 0) {
 		return fmt.Errorf("'records' must not be empty")
 	}
