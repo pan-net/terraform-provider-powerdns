@@ -38,7 +38,6 @@ func resourcePDNSRecord() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-
 			"records": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -70,15 +69,32 @@ func resourcePDNSRecordCreate(d *schema.ResourceData, meta interface{}) error {
 	ttl := d.Get("ttl").(int)
 	recs := d.Get("records").(*schema.Set).List()
 	setPtr := false
+
 	if v, ok := d.GetOk("set_ptr"); ok {
 		setPtr = v.(bool)
 	}
 
+	// begin: ValidateFunc
+	// https://www.terraform.io/docs/extend/schemas/schema-behaviors.html
+	// "ValidateFunc is not yet supported on lists or sets"
+	// when terraform will support ValidateFunc for non-primitives
+	// we can move this block there
+	if !(len(recs) > 0) {
+		return fmt.Errorf("'records' must not be empty")
+	}
+	// end: ValidateFunc
+
 	if len(recs) > 0 {
 		records := make([]Record, 0, len(recs))
 		for _, recContent := range recs {
-			records = append(records, Record{Name: rrSet.Name, Type: rrSet.Type, TTL: ttl, Content: recContent.(string), SetPtr: setPtr})
+			records = append(records,
+				Record{Name: rrSet.Name,
+					Type:    rrSet.Type,
+					TTL:     ttl,
+					Content: recContent.(string),
+					SetPtr:  setPtr})
 		}
+
 		rrSet.Records = records
 
 		log.Printf("[DEBUG] Creating PowerDNS Record: %#v", rrSet)
@@ -91,14 +107,6 @@ func resourcePDNSRecordCreate(d *schema.ResourceData, meta interface{}) error {
 		d.SetId(recID)
 		log.Printf("[INFO] Created PowerDNS Record with ID: %s", d.Id())
 
-	} else {
-		log.Printf("[DEBUG] Deleting empty PowerDNS Record: %#v", rrSet)
-		err := client.DeleteRecordSet(zone, rrSet.Name, rrSet.Type)
-		if err != nil {
-			return fmt.Errorf("Failed to delete PowerDNS Record: %s", err)
-		}
-
-		d.SetId(rrSet.ID())
 	}
 
 	return resourcePDNSRecordRead(d, meta)
