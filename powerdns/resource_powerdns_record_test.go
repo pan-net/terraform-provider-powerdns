@@ -194,7 +194,7 @@ func TestAccPDNSRecord_LOC(t *testing.T) {
 func TestAccPDNSRecord_MX(t *testing.T) {
 	resourceName := "powerdns_record.test-mx"
 	resourceNameMulti := "powerdns_record.test-mx-multi"
-	resourceID := `{"zone":"sysa.xyz.","id":"sysa.xyz.:::MX"}`
+	resourceID := `{"zone":"sysa.xyz.","id":"multi.sysa.xyz.:::MX"}`
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
