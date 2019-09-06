@@ -379,7 +379,7 @@ resource "powerdns_record" "test-mx" {
 const testPDNSRecordConfigMXMulti = `
 resource "powerdns_record" "test-mx-multi" {
 	zone = "sysa.xyz."
-	name = "sysa.xyz."
+	name = "multi.sysa.xyz."
 	type = "MX"
 	ttl = 60
 	records = [ "10 mail1.example.com.", "20 mail2.example.com." ]
