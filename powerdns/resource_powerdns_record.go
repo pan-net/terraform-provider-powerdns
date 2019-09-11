@@ -2,7 +2,6 @@ package powerdns
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 
@@ -171,12 +170,12 @@ func resourcePDNSRecordImport(d *schema.ResourceData, meta interface{}) ([]*sche
 
 	zoneName, ok := data["zone"]
 	if !ok {
-		return nil, errors.New("missing zone name in input data")
+		return nil, fmt.Errorf("missing zone name in input data")
 	}
 
 	recordID, ok := data["id"]
 	if !ok {
-		return nil, errors.New("missing record id in input data")
+		return nil, fmt.Errorf("missing record id in input data")
 	}
 
 	log.Printf("[INFO] importing PowerDNS Record %s in Zone: %s", recordID, zoneName)
@@ -187,7 +186,7 @@ func resourcePDNSRecordImport(d *schema.ResourceData, meta interface{}) ([]*sche
 	}
 
 	if len(records) == 0 {
-		return nil, errors.New("rrset has no records to import")
+		return nil, fmt.Errorf("rrset has no records to import")
 	}
 
 	recs := make([]string, 0, len(records))

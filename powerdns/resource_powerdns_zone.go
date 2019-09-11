@@ -1,8 +1,6 @@
 package powerdns
 
 import (
-	//"encoding/json"
-	//"errors"
 	"fmt"
 	"log"
 
