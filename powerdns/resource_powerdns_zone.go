@@ -85,7 +85,10 @@ func resourcePDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("name", zoneInfo.Name)
 	d.Set("kind", zoneInfo.Kind)
-	d.Set("nameservers", zoneNameservers)
+
+	if zoneInfo.Kind != "Slave" {
+		d.Set("nameservers", zoneNameservers)
+	}
 
 	return nil
 }
