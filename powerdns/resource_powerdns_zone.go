@@ -73,20 +73,20 @@ func resourcePDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Couldn't fetch PowerDNS Zone: %s", err)
 	}
 
-	nameservers, err := client.ListRecordsInRRSet(zoneInfo.Name, zoneInfo.Name, "NS")
-	if err != nil {
-		return fmt.Errorf("couldn't fetch zone %s nameservers from PowerDNS: %v", zoneInfo.Name, err)
-	}
-
-	var zoneNameservers []string
-	for _, nameserver := range nameservers {
-		zoneNameservers = append(zoneNameservers, nameserver.Content)
-	}
-
 	d.Set("name", zoneInfo.Name)
 	d.Set("kind", zoneInfo.Kind)
 
 	if zoneInfo.Kind != "Slave" {
+		nameservers, err := client.ListRecordsInRRSet(zoneInfo.Name, zoneInfo.Name, "NS")
+		if err != nil {
+			return fmt.Errorf("couldn't fetch zone %s nameservers from PowerDNS: %v", zoneInfo.Name, err)
+		}
+
+		var zoneNameservers []string
+		for _, nameserver := range nameservers {
+			zoneNameservers = append(zoneNameservers, nameserver.Content)
+		}
+
 		d.Set("nameservers", zoneNameservers)
 	}
 
