@@ -30,3 +30,12 @@ The following arguments are supported:
 * `name` - (Required) The name of zone.
 * `kind` - (Required) The kind of the zone.
 * `nameservers` - (Required) The zone nameservers.
+
+## Importing
+
+An existing zone can be imported into this resource by supplying the zone name. If the zone is not found, an error will be returned. 
+
+For example, to import zone `test.com.`:
+```sh
+$ terraform import powerdns_zone.test test.com.
+```

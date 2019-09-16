@@ -78,3 +78,19 @@ The following arguments are supported:
 * `type` - (Required) The record type.
 * `ttl` - (Required) The TTL of the record.
 * `records` - (Required) A string list of records.
+
+### Attribute Reference
+
+The id of the resource is a composite of the record name and record type, joined by a separator - `:::`.
+
+For example, record `foo.test.com.` of type `A` will be represented with the following `id`: `foo.test.com.:::A`
+
+### Importing
+
+An existing record can be imported into this resource by supplying both the record id and zone name it belongs to.
+If the record or zone is not found, or if the record is of a different type or in a different zone, an error will be returned.
+
+For example:
+```sh
+$ terraform import powerdns_record.test-a `'{"zone": "test.com.", "id": "foo.test.com.:::A"}'`
+```
