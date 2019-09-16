@@ -2,11 +2,25 @@ package powerdns
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
+
+func TestAccPDNSRecord_Empty(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      testPDNSRecordConfigRecordEmpty,
+				ExpectError: regexp.MustCompile("'records' must not be empty"),
+			},
+		},
+	})
+}
 
 func TestAccPDNSRecord_A(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -301,6 +315,15 @@ func testAccCheckPDNSRecordExists(n string) resource.TestCheckFunc {
 		return fmt.Errorf("Record does not exist: %#v", rs.Primary.ID)
 	}
 }
+
+const testPDNSRecordConfigRecordEmpty = `
+resource "powerdns_record" "test-a" {
+	zone = "sysa.xyz."
+	name = "redis.sysa.xyz."
+	type = "A"
+	ttl = 60
+	records = [ ]
+}`
 
 const testPDNSRecordConfigA = `
 resource "powerdns_record" "test-a" {
