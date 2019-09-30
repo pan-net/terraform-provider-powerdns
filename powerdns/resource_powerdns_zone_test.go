@@ -8,24 +8,80 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
-func TestAccPDNSZone(t *testing.T) {
+func TestAccPDNSZoneNative(t *testing.T) {
+	resourceName := "powerdns_zone.test-native"
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSZoneDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testPDNSZoneConfig,
+				Config: testPDNSZoneConfigNative,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSZoneExists("powerdns_zone.test"),
-					resource.TestCheckResourceAttr("powerdns_zone.test", "name", "sysa.abc."),
-					resource.TestCheckResourceAttr("powerdns_zone.test", "kind", "Native"),
+					testAccCheckPDNSZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "sysa.abc."),
+					resource.TestCheckResourceAttr(resourceName, "kind", "Native"),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
+func TestAccPDNSZoneMaster(t *testing.T) {
+	resourceName := "powerdns_zone.test-master"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSZoneConfigMaster,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "sysa.abc."),
+					resource.TestCheckResourceAttr(resourceName, "kind", "Master"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccPDNSZoneSlave(t *testing.T) {
+	resourceName := "powerdns_zone.test-slave"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSZoneConfigSlave,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "sysa.abc."),
+					resource.TestCheckResourceAttr(resourceName, "kind", "Slave"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
 func testAccCheckPDNSZoneDestroy(s *terraform.State) error {
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "powerdns_zone" {
@@ -64,9 +120,23 @@ func testAccCheckPDNSZoneExists(n string) resource.TestCheckFunc {
 	}
 }
 
-const testPDNSZoneConfig = `
-resource "powerdns_zone" "test" {
+const testPDNSZoneConfigNative = `
+resource "powerdns_zone" "test-native" {
 	name = "sysa.abc."
 	kind = "Native"
 	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
+}`
+
+const testPDNSZoneConfigMaster = `
+resource "powerdns_zone" "test-master" {
+	name = "sysa.abc."
+	kind = "Master"
+	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
+}`
+
+const testPDNSZoneConfigSlave = `
+resource "powerdns_zone" "test-slave" {
+	name = "sysa.abc."
+	kind = "Slave"
+	nameservers = []
 }`

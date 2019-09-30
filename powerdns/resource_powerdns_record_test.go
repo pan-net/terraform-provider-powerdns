@@ -23,6 +23,9 @@ func TestAccPDNSRecord_Empty(t *testing.T) {
 }
 
 func TestAccPDNSRecord_A(t *testing.T) {
+	resourceName := "powerdns_record.test-a"
+	resourceID := `{"zone":"sysa.xyz.","id":"redis.sysa.xyz.:::A"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -31,14 +34,23 @@ func TestAccPDNSRecord_A(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigA,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-a"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_WithPtr(t *testing.T) {
+	resourceName := "powerdns_record.test-a-ptr"
+	resourceID := `{"zone":"sysa.xyz.","id":"redis.sysa.xyz.:::A"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -47,14 +59,24 @@ func TestAccPDNSRecord_WithPtr(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigAWithPtr,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-a-ptr"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportStateId:           resourceID,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"set_ptr"},
 			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_WithCount(t *testing.T) {
+	resourceID0 := `{"zone":"sysa.xyz.","id":"redis-0.sysa.xyz.:::A"}`
+	resourceID1 := `{"zone":"sysa.xyz.","id":"redis-1.sysa.xyz.:::A"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -67,11 +89,26 @@ func TestAccPDNSRecord_WithCount(t *testing.T) {
 					testAccCheckPDNSRecordExists("powerdns_record.test-counted.1"),
 				),
 			},
+			{
+				ResourceName:      "powerdns_record.test-counted[0]",
+				ImportStateId:     resourceID0,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				ResourceName:      "powerdns_record.test-counted[1]",
+				ImportStateId:     resourceID1,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_AAAA(t *testing.T) {
+	resourceName := "powerdns_record.test-aaaa"
+	resourceID := `{"zone":"sysa.xyz.","id":"redis.sysa.xyz.:::AAAA"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -80,14 +117,23 @@ func TestAccPDNSRecord_AAAA(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigAAAA,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-aaaa"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_CNAME(t *testing.T) {
+	resourceName := "powerdns_record.test-cname"
+	resourceID := `{"zone":"sysa.xyz.","id":"redis.sysa.xyz.:::CNAME"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -96,14 +142,23 @@ func TestAccPDNSRecord_CNAME(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigCNAME,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-cname"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_HINFO(t *testing.T) {
+	resourceName := "powerdns_record.test-hinfo"
+	resourceID := `{"zone":"sysa.xyz.","id":"redis.sysa.xyz.:::HINFO"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -112,14 +167,23 @@ func TestAccPDNSRecord_HINFO(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigHINFO,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-hinfo"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_LOC(t *testing.T) {
+	resourceName := "powerdns_record.test-loc"
+	resourceID := `{"zone":"sysa.xyz.","id":"redis.sysa.xyz.:::LOC"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -128,14 +192,25 @@ func TestAccPDNSRecord_LOC(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigLOC,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-loc"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_MX(t *testing.T) {
+	resourceName := "powerdns_record.test-mx"
+	resourceNameMulti := "powerdns_record.test-mx-multi"
+	resourceID := `{"zone":"sysa.xyz.","id":"sysa.xyz.:::MX"}`
+	resourceIDMulti := `{"zone":"sysa.xyz.","id":"multi.sysa.xyz.:::MX"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -144,20 +219,35 @@ func TestAccPDNSRecord_MX(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigMX,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-mx"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			{
 				Config: testPDNSRecordConfigMXMulti,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-mx-multi"),
+					testAccCheckPDNSRecordExists(resourceNameMulti),
 				),
+			},
+			{
+				ResourceName:      resourceNameMulti,
+				ImportStateId:     resourceIDMulti,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_NAPTR(t *testing.T) {
+	resourceName := "powerdns_record.test-naptr"
+	resourceID := `{"zone":"sysa.xyz.","id":"sysa.xyz.:::NAPTR"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -166,14 +256,23 @@ func TestAccPDNSRecord_NAPTR(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigNAPTR,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-naptr"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_NS(t *testing.T) {
+	resourceName := "powerdns_record.test-ns"
+	resourceID := `{"zone":"sysa.xyz.","id":"lab.sysa.xyz.:::NS"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -182,14 +281,23 @@ func TestAccPDNSRecord_NS(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigNS,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-ns"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_SPF(t *testing.T) {
+	resourceName := "powerdns_record.test-spf"
+	resourceID := `{"zone":"sysa.xyz.","id":"sysa.xyz.:::SPF"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -198,14 +306,23 @@ func TestAccPDNSRecord_SPF(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigSPF,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-spf"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_SSHFP(t *testing.T) {
+	resourceName := "powerdns_record.test-sshfp"
+	resourceID := `{"zone":"sysa.xyz.","id":"ssh.sysa.xyz.:::SSHFP"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -214,14 +331,23 @@ func TestAccPDNSRecord_SSHFP(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigSSHFP,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-sshfp"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_SRV(t *testing.T) {
+	resourceName := "powerdns_record.test-srv"
+	resourceID := `{"zone":"sysa.xyz.","id":"_redis._tcp.sysa.xyz.:::SRV"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -230,14 +356,23 @@ func TestAccPDNSRecord_SRV(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigSRV,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-srv"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_TXT(t *testing.T) {
+	resourceName := "powerdns_record.test-txt"
+	resourceID := `{"zone":"sysa.xyz.","id":"text.sysa.xyz.:::TXT"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -246,14 +381,23 @@ func TestAccPDNSRecord_TXT(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigTXT,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-txt"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
 func TestAccPDNSRecord_SOA(t *testing.T) {
+	resourceName := "powerdns_record.test-soa"
+	resourceID := `{"zone":"sysa.xyz.","id":"sysa.xyz.:::SOA"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -262,8 +406,14 @@ func TestAccPDNSRecord_SOA(t *testing.T) {
 			{
 				Config: testPDNSRecordConfigSOA,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-soa"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
@@ -410,7 +560,7 @@ resource "powerdns_record" "test-mx-multi" {
 
 const testPDNSRecordConfigNAPTR = `
 resource "powerdns_record" "test-naptr" {
-	zone = "sysa.xyz"
+	zone = "sysa.xyz."
 	name = "sysa.xyz."
 	type = "NAPTR"
 	ttl = 60
