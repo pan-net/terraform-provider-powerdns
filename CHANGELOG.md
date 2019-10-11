@@ -1,4 +1,11 @@
-## 1.1.1 (Unreleased)
+## 1.2.0 (Unreleased)
+
+FEATURES:
+  * **Added support for terraform resource import** [GH-31]
+
+FIXES:
+  * **Validate value of records** - record with empty records deleted the record from the PowerDNS remote but not from state file [GH-33]
+
 ## 1.1.0 (August 13, 2019)
 
 FEATURES: 
