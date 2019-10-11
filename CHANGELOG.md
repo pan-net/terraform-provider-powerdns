@@ -1,10 +1,10 @@
-## 1.2.0 (Unreleased)
+## 1.2.0 (October 11, 2019)
 
 FEATURES:
-  * **Added support for terraform resource import** [GH-31]
+  * **Added support for terraform resource import** ([#31](https://github.com/terraform-providers/terraform-provider-powerdns/issues/31))
 
 FIXES:
-  * **Validate value of records** - record with empty records deleted the record from the PowerDNS remote but not from state file [GH-33]
+  * **Validate value of records** - record with empty records deleted the record from the PowerDNS remote but not from state file ([#33](https://github.com/terraform-providers/terraform-provider-powerdns/issues/33))
 
 ## 1.1.0 (August 13, 2019)
 
