@@ -36,7 +36,8 @@ The following arguments are supported:
 An existing zone can be imported into this resource by supplying the zone name. If the zone is not found, an error will be returned. 
 
 For example, to import zone `test.com.`:
-```sh
+
+```
 $ terraform import powerdns_zone.test test.com.
 ```
 
