@@ -9,6 +9,9 @@ GOFLAGS=-mod=vendor
 default: build
 
 build: fmtcheck
+	go build
+
+install: fmtcheck
 	go install
 
 test: fmtcheck
