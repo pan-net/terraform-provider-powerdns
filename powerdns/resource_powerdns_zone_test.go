@@ -11,7 +11,7 @@ import (
 func TestAccPDNSZoneNative(t *testing.T) {
 	resourceName := "powerdns_zone.test-native"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSZoneDestroy,
@@ -36,7 +36,7 @@ func TestAccPDNSZoneNative(t *testing.T) {
 func TestAccPDNSZoneMaster(t *testing.T) {
 	resourceName := "powerdns_zone.test-master"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSZoneDestroy,
@@ -45,7 +45,7 @@ func TestAccPDNSZoneMaster(t *testing.T) {
 				Config: testPDNSZoneConfigMaster,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckPDNSZoneExists(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "name", "sysa.abc."),
+					resource.TestCheckResourceAttr(resourceName, "name", "master.sysa.abc."),
 					resource.TestCheckResourceAttr(resourceName, "kind", "Master"),
 				),
 			},
@@ -61,7 +61,7 @@ func TestAccPDNSZoneMaster(t *testing.T) {
 func TestAccPDNSZoneSlave(t *testing.T) {
 	resourceName := "powerdns_zone.test-slave"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSZoneDestroy,
@@ -70,7 +70,7 @@ func TestAccPDNSZoneSlave(t *testing.T) {
 				Config: testPDNSZoneConfigSlave,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckPDNSZoneExists(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "name", "sysa.abc."),
+					resource.TestCheckResourceAttr(resourceName, "name", "slave.sysa.abc."),
 					resource.TestCheckResourceAttr(resourceName, "kind", "Slave"),
 				),
 			},
@@ -129,14 +129,14 @@ resource "powerdns_zone" "test-native" {
 
 const testPDNSZoneConfigMaster = `
 resource "powerdns_zone" "test-master" {
-	name = "sysa.abc."
+	name = "master.sysa.abc."
 	kind = "Master"
 	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
 }`
 
 const testPDNSZoneConfigSlave = `
 resource "powerdns_zone" "test-slave" {
-	name = "sysa.abc."
+	name = "slave.sysa.abc."
 	kind = "Slave"
 	nameservers = []
 }`
