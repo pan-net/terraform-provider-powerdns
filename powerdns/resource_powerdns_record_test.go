@@ -10,7 +10,7 @@ import (
 )
 
 func TestAccPDNSRecord_Empty(t *testing.T) {
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
@@ -24,9 +24,9 @@ func TestAccPDNSRecord_Empty(t *testing.T) {
 
 func TestAccPDNSRecord_A(t *testing.T) {
 	resourceName := "powerdns_record.test-a"
-	resourceID := `{"zone":"sysa.xyz.","id":"redis.sysa.xyz.:::A"}`
+	resourceID := `{"zone":"sysa.xyz.","id":"testpdnsrecordconfiga.sysa.xyz.:::A"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -49,9 +49,9 @@ func TestAccPDNSRecord_A(t *testing.T) {
 
 func TestAccPDNSRecord_WithPtr(t *testing.T) {
 	resourceName := "powerdns_record.test-a-ptr"
-	resourceID := `{"zone":"sysa.xyz.","id":"redis.sysa.xyz.:::A"}`
+	resourceID := `{"zone":"sysa.xyz.","id":"testpdnsrecordconfigawithptr.sysa.xyz.:::A"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -74,10 +74,10 @@ func TestAccPDNSRecord_WithPtr(t *testing.T) {
 }
 
 func TestAccPDNSRecord_WithCount(t *testing.T) {
-	resourceID0 := `{"zone":"sysa.xyz.","id":"redis-0.sysa.xyz.:::A"}`
-	resourceID1 := `{"zone":"sysa.xyz.","id":"redis-1.sysa.xyz.:::A"}`
+	resourceID0 := `{"zone":"sysa.xyz.","id":"testpdnsrecordconfighyphenedwithcount-0.sysa.xyz.:::A"}`
+	resourceID1 := `{"zone":"sysa.xyz.","id":"testpdnsrecordconfighyphenedwithcount-1.sysa.xyz.:::A"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -107,9 +107,9 @@ func TestAccPDNSRecord_WithCount(t *testing.T) {
 
 func TestAccPDNSRecord_AAAA(t *testing.T) {
 	resourceName := "powerdns_record.test-aaaa"
-	resourceID := `{"zone":"sysa.xyz.","id":"redis.sysa.xyz.:::AAAA"}`
+	resourceID := `{"zone":"sysa.xyz.","id":"testpdnsrecordconfigaaaa.sysa.xyz.:::AAAA"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -132,9 +132,9 @@ func TestAccPDNSRecord_AAAA(t *testing.T) {
 
 func TestAccPDNSRecord_CNAME(t *testing.T) {
 	resourceName := "powerdns_record.test-cname"
-	resourceID := `{"zone":"sysa.xyz.","id":"redis.sysa.xyz.:::CNAME"}`
+	resourceID := `{"zone":"sysa.xyz.","id":"testpdnsrecordconfigcname.sysa.xyz.:::CNAME"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -157,9 +157,9 @@ func TestAccPDNSRecord_CNAME(t *testing.T) {
 
 func TestAccPDNSRecord_HINFO(t *testing.T) {
 	resourceName := "powerdns_record.test-hinfo"
-	resourceID := `{"zone":"sysa.xyz.","id":"redis.sysa.xyz.:::HINFO"}`
+	resourceID := `{"zone":"sysa.xyz.","id":"testpdnsrecordconfighinfo.sysa.xyz.:::HINFO"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -182,9 +182,9 @@ func TestAccPDNSRecord_HINFO(t *testing.T) {
 
 func TestAccPDNSRecord_LOC(t *testing.T) {
 	resourceName := "powerdns_record.test-loc"
-	resourceID := `{"zone":"sysa.xyz.","id":"redis.sysa.xyz.:::LOC"}`
+	resourceID := `{"zone":"sysa.xyz.","id":"testpdnsrecordconfigloc.sysa.xyz.:::LOC"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -211,7 +211,7 @@ func TestAccPDNSRecord_MX(t *testing.T) {
 	resourceID := `{"zone":"sysa.xyz.","id":"sysa.xyz.:::MX"}`
 	resourceIDMulti := `{"zone":"sysa.xyz.","id":"multi.sysa.xyz.:::MX"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -248,7 +248,7 @@ func TestAccPDNSRecord_NAPTR(t *testing.T) {
 	resourceName := "powerdns_record.test-naptr"
 	resourceID := `{"zone":"sysa.xyz.","id":"sysa.xyz.:::NAPTR"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -273,7 +273,7 @@ func TestAccPDNSRecord_NS(t *testing.T) {
 	resourceName := "powerdns_record.test-ns"
 	resourceID := `{"zone":"sysa.xyz.","id":"lab.sysa.xyz.:::NS"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -298,7 +298,7 @@ func TestAccPDNSRecord_SPF(t *testing.T) {
 	resourceName := "powerdns_record.test-spf"
 	resourceID := `{"zone":"sysa.xyz.","id":"sysa.xyz.:::SPF"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -323,7 +323,7 @@ func TestAccPDNSRecord_SSHFP(t *testing.T) {
 	resourceName := "powerdns_record.test-sshfp"
 	resourceID := `{"zone":"sysa.xyz.","id":"ssh.sysa.xyz.:::SSHFP"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -348,7 +348,7 @@ func TestAccPDNSRecord_SRV(t *testing.T) {
 	resourceName := "powerdns_record.test-srv"
 	resourceID := `{"zone":"sysa.xyz.","id":"_redis._tcp.sysa.xyz.:::SRV"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -373,7 +373,7 @@ func TestAccPDNSRecord_TXT(t *testing.T) {
 	resourceName := "powerdns_record.test-txt"
 	resourceID := `{"zone":"sysa.xyz.","id":"text.sysa.xyz.:::TXT"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -398,7 +398,7 @@ func TestAccPDNSRecord_SOA(t *testing.T) {
 	resourceName := "powerdns_record.test-soa"
 	resourceID := `{"zone":"sysa.xyz.","id":"sysa.xyz.:::SOA"}`
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
@@ -469,7 +469,7 @@ func testAccCheckPDNSRecordExists(n string) resource.TestCheckFunc {
 const testPDNSRecordConfigRecordEmpty = `
 resource "powerdns_record" "test-a" {
 	zone = "sysa.xyz."
-	name = "redis.sysa.xyz."
+	name = "testpdnsrecordconfigrecordempty.sysa.xyz."
 	type = "A"
 	ttl = 60
 	records = [ ]
@@ -478,7 +478,7 @@ resource "powerdns_record" "test-a" {
 const testPDNSRecordConfigA = `
 resource "powerdns_record" "test-a" {
 	zone = "sysa.xyz."
-	name = "redis.sysa.xyz."
+	name = "testpdnsrecordconfiga.sysa.xyz."
 	type = "A"
 	ttl = 60
 	records = [ "1.1.1.1", "2.2.2.2" ]
@@ -487,7 +487,7 @@ resource "powerdns_record" "test-a" {
 const testPDNSRecordConfigAWithPtr = `
 resource "powerdns_record" "test-a-ptr" {
 	zone = "sysa.xyz."
-	name = "redis.sysa.xyz."
+	name = "testpdnsrecordconfigawithptr.sysa.xyz."
 	type = "A"
 	ttl = 60
 	set_ptr = true
@@ -498,7 +498,7 @@ const testPDNSRecordConfigHyphenedWithCount = `
 resource "powerdns_record" "test-counted" {
 	count = "2"
 	zone = "sysa.xyz."
-	name = "redis-${count.index}.sysa.xyz."
+	name = "testpdnsrecordconfighyphenedwithcount-${count.index}.sysa.xyz."
 	type = "A"
 	ttl = 60
 	records = [ "1.1.1.${count.index}" ]
@@ -507,7 +507,7 @@ resource "powerdns_record" "test-counted" {
 const testPDNSRecordConfigAAAA = `
 resource "powerdns_record" "test-aaaa" {
 	zone = "sysa.xyz."
-	name = "redis.sysa.xyz."
+	name = "testpdnsrecordconfigaaaa.sysa.xyz."
 	type = "AAAA"
 	ttl = 60
 	records = [ "2001:db8:2000:bf0::1", "2001:db8:2000:bf1::1" ]
@@ -516,7 +516,7 @@ resource "powerdns_record" "test-aaaa" {
 const testPDNSRecordConfigCNAME = `
 resource "powerdns_record" "test-cname" {
 	zone = "sysa.xyz."
-	name = "redis.sysa.xyz."
+	name = "testpdnsrecordconfigcname.sysa.xyz."
 	type = "CNAME"
 	ttl = 60
 	records = [ "redis.example.com." ]
@@ -525,7 +525,7 @@ resource "powerdns_record" "test-cname" {
 const testPDNSRecordConfigHINFO = `
 resource "powerdns_record" "test-hinfo" {
 	zone = "sysa.xyz."
-	name = "redis.sysa.xyz."
+	name = "testpdnsrecordconfighinfo.sysa.xyz."
 	type = "HINFO"
 	ttl = 60
 	records = [ "\"PC-Intel-2.4ghz\" \"Linux\"" ]
@@ -534,7 +534,7 @@ resource "powerdns_record" "test-hinfo" {
 const testPDNSRecordConfigLOC = `
 resource "powerdns_record" "test-loc" {
 	zone = "sysa.xyz."
-	name = "redis.sysa.xyz."
+	name = "testpdnsrecordconfigloc.sysa.xyz."
 	type = "LOC"
 	ttl = 60
 	records = [ "51 56 0.123 N 5 54 0.000 E 4.00m 1.00m 10000.00m 10.00m" ]
