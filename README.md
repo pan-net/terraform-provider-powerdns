@@ -86,7 +86,7 @@ After setup is done, run the acceptance tests with `make testacc` (note the env 
 ```sh
 ~$  PDNS_SERVER_URL=localhost:4443 \
     PDNS_API_KEY=secret \
-    PDNS_CACERT=$(cat PWD/tests/files/ssl/rootCA/rootCA.crt) \
+    PDNS_CACERT=$(cat ./tests/files/ssl/rootCA/rootCA.crt) \
     make testacc
 ````
 
