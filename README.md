@@ -53,7 +53,7 @@ Make sure the changes you performed pass linting:
 $ make lint
 ```
 
-To install the provider, run `make build`. This will build the provider and put the provider binary the current working directory.
+To install the provider, run `make build`. This will build the provider and put the provider binary in the current working directory.
 
 ```sh
 $ make build
