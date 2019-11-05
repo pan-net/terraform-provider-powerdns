@@ -58,6 +58,85 @@ func TestAccPDNSZoneMaster(t *testing.T) {
 	})
 }
 
+func TestAccPDNSZoneMasterSOAAPIEDIT(t *testing.T) {
+	resourceName := "powerdns_zone.test-master-soa-edit-api"
+	resourceSOAEDITAPI := `DEFAULT`
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSZoneConfigMasterSOAEDITAPI,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "master-soa-edit-api.sysa.abc."),
+					resource.TestCheckResourceAttr(resourceName, "kind", "Master"),
+					resource.TestCheckResourceAttr(resourceName, "soa_edit_api", resourceSOAEDITAPI),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccPDNSZoneMasterSOAAPIEDITEmpty(t *testing.T) {
+	resourceName := "powerdns_zone.test-master-soa-edit-api-empty"
+	resourceSOAEDITAPI := `""`
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSZoneConfigMasterSOAEDITAPIEmpty,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "master-soa-edit-api-empty.sysa.abc."),
+					resource.TestCheckResourceAttr(resourceName, "kind", "Master"),
+					resource.TestCheckResourceAttr(resourceName, "soa_edit_api", resourceSOAEDITAPI),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccPDNSZoneMasterSOAAPIEDITUndefined(t *testing.T) {
+	resourceName := "powerdns_zone.test-master-soa-edit-api-undefined"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSZoneConfigMasterSOAEDITAPIUndefined,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "master-soa-edit-api-undefined.sysa.abc."),
+					resource.TestCheckResourceAttr(resourceName, "kind", "Master"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccPDNSZoneSlave(t *testing.T) {
 	resourceName := "powerdns_zone.test-slave"
 
@@ -130,6 +209,29 @@ resource "powerdns_zone" "test-native" {
 const testPDNSZoneConfigMaster = `
 resource "powerdns_zone" "test-master" {
 	name = "master.sysa.abc."
+	kind = "Master"
+	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
+}`
+
+const testPDNSZoneConfigMasterSOAEDITAPI = `
+resource "powerdns_zone" "test-master-soa-edit-api" {
+	name = "master-soa-edit-api.sysa.abc."
+	kind = "Master"
+	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
+	soa_edit_api = "DEFAULT"
+}`
+
+const testPDNSZoneConfigMasterSOAEDITAPIEmpty = `
+resource "powerdns_zone" "test-master-soa-edit-api-empty" {
+	name = "master-soa-edit-api-empty.sysa.abc."
+	kind = "Master"
+	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
+	soa_edit_api = "\"\""
+}`
+
+const testPDNSZoneConfigMasterSOAEDITAPIUndefined = `
+resource "powerdns_zone" "test-master-soa-edit-api-undefined" {
+	name = "master-soa-edit-api-undefined.sysa.abc."
 	kind = "Master"
 	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
 }`

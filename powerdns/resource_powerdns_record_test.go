@@ -396,7 +396,7 @@ func TestAccPDNSRecord_TXT(t *testing.T) {
 
 func TestAccPDNSRecord_SOA(t *testing.T) {
 	resourceName := "powerdns_record.test-soa"
-	resourceID := `{"zone":"sysa.xyz.","id":"sysa.xyz.:::SOA"}`
+	resourceID := `{"zone":"test-soa-sysa.xyz.","id":"test-soa-sysa.xyz.:::SOA"}`
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -614,8 +614,8 @@ resource "powerdns_record" "test-txt" {
 
 const testPDNSRecordConfigSOA = `
 resource "powerdns_record" "test-soa" {
-	zone = "sysa.xyz."
-	name = "sysa.xyz."
+	zone = "test-soa-sysa.xyz."
+	name = "test-soa-sysa.xyz."
 	type = "SOA"
 	ttl = 3600
 	records = [ "something.something. hostmaster.sysa.xyz. 2019090301 10800 3600 604800 3600" ]
