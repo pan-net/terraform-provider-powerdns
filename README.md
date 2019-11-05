@@ -34,7 +34,7 @@ Build repository:
 $ go build
 ```
 
-This will compile and place provider binary, `terraform-provider-powerdns`, in the current directory.
+This will compile and place the provider binary, `terraform-provider-powerdns`, in the current directory.
 
 Using the provider
 ----------------------
@@ -45,7 +45,7 @@ Developing the Provider
 ---------------------------
 
 If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (version 1.11+ is *recommended*).
-You'll also need to have `$GOPATH/bin` to your `$PATH`.
+You'll also need to have `$GOPATH/bin` in your `$PATH`.
 
 Make sure the changes you performed pass linting:
 
@@ -65,7 +65,7 @@ In order to run local provider tests, you can simply run `make test`.
 $ make test
 ```
 
-For running acceptance tests locally, you need to use `docker-compose` to prepare the test environment:
+For running acceptance tests locally, you'll need to use `docker-compose` to prepare the test environment:
 
 ```sh
 docker-compose run --rm setup
@@ -73,7 +73,7 @@ docker-compose run --rm setup
 
 After setup is done, run the acceptance tests with `make testacc` (note the env variables needed to interact with the PowerDNS container)
 
-\* HTTP
+* HTTP
 
 ```sh
 ~$  PDNS_SERVER_URL=http://localhost:8081 \
@@ -81,12 +81,12 @@ After setup is done, run the acceptance tests with `make testacc` (note the env 
     make testacc
 ````
 
-\* HTTPS
+* HTTPS
 
 ```sh
 ~$  PDNS_SERVER_URL=localhost:4443 \
     PDNS_API_KEY=secret \
-    PDNS_CACERT="$PWD/tests/files/ssl/rootCA/rootCA.crt" \
+    PDNS_CACERT=$(cat PWD/tests/files/ssl/rootCA/rootCA.crt) \
     make testacc
 ````
 
