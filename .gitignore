@@ -1,3 +1,5 @@
+terraform-provider-dns
+
 *.dll
 *.exe
 .DS_Store
