@@ -36,6 +36,11 @@ func resourcePDNSZone() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
+			"soa_edit_api": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: false,
+			},
 		},
 	}
 }
@@ -52,6 +57,7 @@ func resourcePDNSZoneCreate(d *schema.ResourceData, meta interface{}) error {
 		Name:        d.Get("name").(string),
 		Kind:        d.Get("kind").(string),
 		Nameservers: nameservers,
+		SoaEditAPI:  d.Get("soa_edit_api").(string),
 	}
 
 	createdZoneInfo, err := client.CreateZone(zoneInfo)
@@ -75,6 +81,7 @@ func resourcePDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("name", zoneInfo.Name)
 	d.Set("kind", zoneInfo.Kind)
+	d.Set("soa_edit_api", zoneInfo.SoaEditAPI)
 
 	if zoneInfo.Kind != "Slave" {
 		nameservers, err := client.ListRecordsInRRSet(zoneInfo.Name, zoneInfo.Name, "NS")

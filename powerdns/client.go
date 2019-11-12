@@ -156,6 +156,7 @@ type ZoneInfo struct {
 	Records            []Record            `json:"records,omitempty"`
 	ResourceRecordSets []ResourceRecordSet `json:"rrsets,omitempty"`
 	Nameservers        []string            `json:"nameservers,omitempty"`
+	SoaEditAPI         string              `json:"soa_edit_api"`
 }
 
 // Record represents a PowerDNS record object
