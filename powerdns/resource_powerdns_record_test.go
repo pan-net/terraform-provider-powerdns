@@ -394,6 +394,31 @@ func TestAccPDNSRecord_TXT(t *testing.T) {
 	})
 }
 
+func TestAccPDNSRecord_ALIAS(t *testing.T) {
+	resourceName := "powerdns_record.test-alias"
+	resourceID := `{"zone":"sysa.xyz.","id":"alias.sysa.xyz.:::ALIAS"}`
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSRecordDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSRecordConfigALIAS,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSRecordExists(resourceName),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccPDNSRecord_SOA(t *testing.T) {
 	resourceName := "powerdns_record.test-soa"
 	resourceID := `{"zone":"test-soa-sysa.xyz.","id":"test-soa-sysa.xyz.:::SOA"}`
@@ -610,6 +635,15 @@ resource "powerdns_record" "test-txt" {
 	type = "TXT"
 	ttl = 60
 	records = [ "\"text record payload\"" ]
+}`
+
+const testPDNSRecordConfigALIAS = `
+resource "powerdns_record" "test-alias" {
+	zone = "sysa.xyz."
+	name = "alias.sysa.xyz."
+	type = "ALIAS"
+	ttl = 3600
+	records = [ "www.some-alias.com." ]
 }`
 
 const testPDNSRecordConfigSOA = `
