@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform/helper/pathorcontents"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/pathorcontents"
 )
 
 // Config describes de configuration interface of this provider
