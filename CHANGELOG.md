@@ -1,4 +1,17 @@
-## 1.2.1 (Unreleased)
+## 1.3.0 (Unreleased)
+
+FEATURES:
+  * **Move to using ParallelTest** - making tests faster [GH-38]
+  * **Added soa_edit_api option** [GH-40]
+
+FIXES:
+  * **Fixed formatting in docs regarding import function** [GH-31]
+
+ENHANCEMENTS:
+  * **Added tests for ALIAS type** [GH-42]
+  * **Migrated to terraform plugin SDK** [GH-47]
+  * **Updated vedor dependencies** [GH-48]
+
 ## 1.2.0 (October 11, 2019)
 
 FEATURES:
