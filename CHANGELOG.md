@@ -1,16 +1,16 @@
-## 1.3.0 (Unreleased)
+## 1.3.0 (December 20, 2019)
 
 FEATURES:
-  * **Move to using ParallelTest** - making tests faster [GH-38]
-  * **Added soa_edit_api option** [GH-40]
+  * **Move to using ParallelTest** - making tests faster ([#38](https://github.com/terraform-providers/terraform-provider-powerdns/issues/38))
+  * **Added soa_edit_api option** ([#40](https://github.com/terraform-providers/terraform-provider-powerdns/issues/40))
 
 FIXES:
-  * **Fixed formatting in docs regarding import function** [GH-31]
+  * **Fixed formatting in docs regarding import function** ([#31](https://github.com/terraform-providers/terraform-provider-powerdns/issues/31))
 
 ENHANCEMENTS:
-  * **Added tests for ALIAS type** [GH-42]
-  * **Migrated to terraform plugin SDK** [GH-47]
-  * **Updated vedor dependencies** [GH-48]
+  * **Added tests for ALIAS type** ([#42](https://github.com/terraform-providers/terraform-provider-powerdns/issues/42))
+  * **Migrated to terraform plugin SDK** ([#47](https://github.com/terraform-providers/terraform-provider-powerdns/issues/47))
+  * **Updated vedor dependencies** ([#48](https://github.com/terraform-providers/terraform-provider-powerdns/issues/48))
 
 ## 1.2.0 (October 11, 2019)
 
