@@ -1,5 +1,8 @@
 ## 1.3.1 (Unreleased)
 
+FEATURES:
+  * **Added ServerVersion attribute to client** [GH-52]
+
 FIXES:
   * **Updated client tests to test sanitizeURL directly** [GH-51]
 

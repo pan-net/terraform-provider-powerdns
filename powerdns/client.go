@@ -20,10 +20,11 @@ var DefaultSchema = "https"
 
 // Client is a PowerDNS client representation
 type Client struct {
-	ServerURL  string // Location of PowerDNS server to use
-	APIKey     string // REST API Static authentication key
-	APIVersion int    // API version to use
-	HTTP       *http.Client
+	ServerURL     string // Location of PowerDNS server to use
+	ServerVersion string
+	APIKey        string // REST API Static authentication key
+	APIVersion    int    // API version to use
+	HTTP          *http.Client
 }
 
 // NewClient returns a new PowerDNS client
@@ -43,6 +44,10 @@ func NewClient(serverURL string, apiKey string, configTLS *tls.Config) (*Client,
 		APIKey:     apiKey,
 		HTTP:       httpClient,
 		APIVersion: -1,
+	}
+
+	if err := client.setServerVersion(); err != nil {
+		return nil, fmt.Errorf("Error while creating client: %s", err)
 	}
 
 	return &client, nil
@@ -184,6 +189,16 @@ type zonePatchRequest struct {
 
 type errorResponse struct {
 	ErrorMsg string `json:"error"`
+}
+
+type serverInfo struct {
+	ConfigURL  string `json:"config_url"`
+	DaemonType string `json:"daemon_type"`
+	ID         string `json:"id"`
+	Type       string `json:"type"`
+	URL        string `json:"url"`
+	Version    string `json:"version"`
+	ZonesURL   string `json:"zones_url"`
 }
 
 const idSeparator string = ":::"
@@ -557,4 +572,30 @@ func (client *Client) DeleteRecordSetByID(zone string, recID string) error {
 		return err
 	}
 	return client.DeleteRecordSet(zone, name, tpe)
+}
+
+func (client *Client) setServerVersion() error {
+	req, err := client.newRequest("GET", "/servers/localhost", nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := client.HTTP.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("Invalid response code from server: '%d'. Response body: %v",
+			resp.StatusCode, resp.Body)
+	}
+
+	serverInfo := new(serverInfo)
+	err = json.NewDecoder(resp.Body).Decode(serverInfo)
+	if err != nil {
+		return err
+	}
+
+	client.ServerVersion = serverInfo.Version
+	return nil
 }
