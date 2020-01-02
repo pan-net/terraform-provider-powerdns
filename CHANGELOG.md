@@ -1,4 +1,8 @@
 ## 1.3.1 (Unreleased)
+
+FIXES:
+  * **Updated client tests to test sanitizeURL directly** [GH-51]
+
 ## 1.3.0 (December 20, 2019)
 
 FEATURES:
@@ -23,7 +27,7 @@ FIXES:
 
 ## 1.1.0 (August 13, 2019)
 
-FEATURES: 
+FEATURES:
   * **HTTPS Custom CA**: added option for custom Root CA for HTTPS Certificate validation (option `ca_certificate`) ([#22](https://github.com/terraform-providers/terraform-provider-powerdns/issues/22))
   * **HTTPS**: added option to skip HTTPS certificate validation - insecure HTTPS (option `insecure_https`) ([#22](https://github.com/terraform-providers/terraform-provider-powerdns/issues/22))
 
@@ -37,8 +41,8 @@ NOTES:
  * provider: This release includes only a Terraform SDK upgrade with compatibility for Terraform v0.12. The provider remains backwards compatible with Terraform v0.11 and this update should have no significant changes in behavior for the provider. Please report any unexpected behavior in new GitHub issues (Terraform core: https://github.com/hashicorp/terraform/issues or Terraform PowerDNS Provider: https://github.com/terraform-providers/terraform-provider-powerdns/issues) ([#16](https://github.com/terraform-providers/terraform-provider-powerdns/issues/16))
 
 ENHANCEMENTS:
-  * Switch to go modules and Terraform v0.12 SDK [[#16](https://github.com/terraform-providers/terraform-provider-powerdns/issues/16)] 
-  
+  * Switch to go modules and Terraform v0.12 SDK [[#16](https://github.com/terraform-providers/terraform-provider-powerdns/issues/16)]
+
 ## 0.2.0 (July 31, 2019)
 
 FEATURES:

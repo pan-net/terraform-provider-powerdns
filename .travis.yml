@@ -23,9 +23,9 @@ script:
 - make website-test
 - docker-compose run --rm setup
 # run test using custom root CA
-- PDNS_SERVER_URL=localhost:4443 PDNS_API_KEY=secret PDNS_CACERT="$PWD/tests/files/ssl/rootCA/rootCA.crt" make testacc
+- TESTARGS="-run ^TestAcc" PDNS_SERVER_URL=localhost:4443 PDNS_API_KEY=secret PDNS_CACERT="$PWD/tests/files/ssl/rootCA/rootCA.crt" make testacc
 # run test skipping TLS verification (Insecure HTTPS)
-- PDNS_SERVER_URL=localhost:4443 PDNS_API_KEY=secret PDNS_INSECURE_HTTPS=true make testacc
+- TESTARGS="-run ^TestAcc" PDNS_SERVER_URL=localhost:4443 PDNS_API_KEY=secret PDNS_INSECURE_HTTPS=true make testacc
 - docker-compose down
 
 branches:
