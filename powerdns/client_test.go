@@ -1,7 +1,6 @@
 package powerdns
 
 import (
-	"crypto/tls"
 	"strings"
 	"testing"
 
@@ -9,7 +8,6 @@ import (
 )
 
 var (
-	tlsConfig                               = &tls.Config{}
 	URLMissingSchemaAndNotEndingWithSlash   = "powerdnsapi.com"
 	URLMissingSchemaAndEndingWithSlash      = "powerdnsapi.com/"
 	URLWithSchemaAndEndingWithSlash         = "http://powerdnsapi.com/"
@@ -22,90 +20,82 @@ var (
 )
 
 func TestURLMissingSchema(t *testing.T) {
-	client, err := NewClient(URLMissingSchemaAndNotEndingWithSlash,
-		"secretapikey", tlsConfig)
+	url, err := sanitizeURL(URLMissingSchemaAndNotEndingWithSlash)
 	assert.NoError(t, err)
 
 	expectedURL := DefaultSchema + "://" + URLMissingSchemaAndNotEndingWithSlash
-
-	assert.Equal(t, client.ServerURL, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
+	assert.Equal(t, url, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+url+"'")
 }
 
 func TestURLMissingSchemaAndEndingWithSlash(t *testing.T) {
-	client, err := NewClient(URLMissingSchemaAndEndingWithSlash,
-		"secretapikey", tlsConfig)
+	url, err := sanitizeURL(URLMissingSchemaAndEndingWithSlash)
 	assert.NoError(t, err)
 
 	expectedURL := DefaultSchema + "://" +
 		strings.TrimSuffix(URLMissingSchemaAndEndingWithSlash, "/")
 
-	assert.Equal(t, client.ServerURL, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
+	assert.Equal(t, url, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+url+"'")
 }
 
 func TestURLWithSchemaAndEndingWithSlash(t *testing.T) {
-	client, err := NewClient(URLWithSchemaAndEndingWithSlash,
-		"secretapikey", tlsConfig)
+	url, err := sanitizeURL(URLWithSchemaAndEndingWithSlash)
 	assert.NoError(t, err)
 
 	expectedURL := strings.TrimSuffix(URLWithSchemaAndEndingWithSlash, "/")
 
-	assert.Equal(t, client.ServerURL, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
+	assert.Equal(t, url, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+url+"'")
 }
 
 func TestURLWithSchemaAndNotEndingWithSlash(t *testing.T) {
-	client, err := NewClient(URLWithSchemaAndNotEndingWithSlash,
-		"secretapikey", tlsConfig)
+	url, err := sanitizeURL(URLWithSchemaAndNotEndingWithSlash)
 	assert.NoError(t, err)
 
 	expectedURL := URLWithSchemaAndNotEndingWithSlash
 
-	assert.Equal(t, client.ServerURL, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
+	assert.Equal(t, url, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+url+"'")
 }
 
 func TestURLMissingSchemaHasPort(t *testing.T) {
-	client, err := NewClient(URLMissingSchemaHasPort, "secretapikey", tlsConfig)
+	url, err := sanitizeURL(URLMissingSchemaHasPort)
 	assert.NoError(t, err)
 
 	expectedURL := DefaultSchema + "://" + URLMissingSchemaHasPort
 
-	assert.Equal(t, client.ServerURL, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
+	assert.Equal(t, url, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+url+"'")
 }
 
 func TestURLMissingSchemaHasPortAndEndsWithSlash(t *testing.T) {
-	client, err := NewClient(URLMissingSchemaHasPortAndEndsWithSlash,
-		"secretapikey", tlsConfig)
+	url, err := sanitizeURL(URLMissingSchemaHasPortAndEndsWithSlash)
 	assert.NoError(t, err)
 
 	expectedURL := DefaultSchema + "://" +
 		strings.TrimSuffix(URLMissingSchemaHasPortAndEndsWithSlash, "/")
 
-	assert.Equal(t, client.ServerURL, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
+	assert.Equal(t, url, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+url+"'")
 }
 
 func TestURLWithSchemaHasPort(t *testing.T) {
-	client, err := NewClient(URLWithSchemaHasPort,
-		"secretapikey", tlsConfig)
+	url, err := sanitizeURL(URLWithSchemaHasPort)
 	assert.NoError(t, err)
 
 	expectedURL := URLWithSchemaHasPort
 
-	assert.Equal(t, client.ServerURL, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
+	assert.Equal(t, url, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+url+"'")
 }
 
 func TestURLWithSchemaHasPortAndEndsWithSlash(t *testing.T) {
-	client, err := NewClient(URLWithSchemaHasPortAndEndsWithSlash,
-		"secretapikey", tlsConfig)
+	url, err := sanitizeURL(URLWithSchemaHasPortAndEndsWithSlash)
 	assert.NoError(t, err)
 
 	expectedURL := strings.TrimSuffix(URLWithSchemaHasPortAndEndsWithSlash, "/")
 
-	assert.Equal(t, client.ServerURL, expectedURL,
-		"Expected '"+expectedURL+"' but got '"+client.ServerURL+"'")
+	assert.Equal(t, url, expectedURL,
+		"Expected '"+expectedURL+"' but got '"+url+"'")
 }
