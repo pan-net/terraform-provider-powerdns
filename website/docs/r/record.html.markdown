@@ -12,7 +12,7 @@ Provides a PowerDNS record resource.
 
 ## Example Usage
 
-Note that PowerDNS internally lowercases certain records (e.g. CNAME and AAAA), which can lead to resources being marked for a change in every single plan/apply.
+Note that PowerDNS may internally lowercase certain records (e.g. CNAME and AAAA), which may lead to resources being marked for a change in every single plan/apply.
 
 ### A record example
 For the v1 API (PowerDNS version 4):
@@ -51,7 +51,7 @@ Existing PTR records with the same name are replaced. If no matching reverse zon
 You can use `powerdns_zone` resource to create the reverse zone.
 
 
-!> **Warning:** Using _set_ptr:true_  will not automatically remove the PTR record when A/AAAA record is deleted. You should create PTR zone using `powerdns_zone` and manage PTR records using `powerdns_record`, rather than using _set_ptr_. With upcoming _set_ptr_ deprecation, this will become default way of maintaining PTR records.
+!> **Warning:** Using _set_ptr:true_  will not automatically remove the PTR record when A/AAAA record is deleted. You should create PTR zone using `powerdns_zone` and manage PTR records using `powerdns_record`, rather than using _set_ptr_. With upcoming _set_ptr_ deprecation, this will be the only way of maintaining PTR records **via this provider**.
 
 Here is an example of creating A record along with corresponding PTR record:
 
@@ -88,7 +88,7 @@ The following arguments are supported:
 * `type` - (Required) The record type.
 * `ttl` - (Required) The TTL of the record.
 * `records` - (Required) A string list of records.
-* `set_ptr` - (Optional) A boolean (true/false), determining whether API server should automatically create PTR record in the matching reverse zone. Existing PTR records are replaced. If no matching reverse zone, an error is thrown.
+* `set_ptr` - (Optional) [**_Deprecated in PowerDNS 4.3.0_**] A boolean (true/false), determining whether API server should automatically create PTR record in the matching reverse zone. Existing PTR records are replaced. If no matching reverse zone, an error is thrown.
 
 ### Attribute Reference
 
