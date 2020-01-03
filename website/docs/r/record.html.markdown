@@ -12,8 +12,9 @@ Provides a PowerDNS record resource.
 
 ## Example Usage
 
-Note that PowerDNS internally lowercases certain records (e.g. CNAME and AAAA), which can lead to resources being marked for a change in every singe plan.
+Note that PowerDNS may internally lowercase certain records (e.g. CNAME and AAAA), which may lead to resources being marked for a change in every single plan/apply.
 
+### A record example
 For the v1 API (PowerDNS version 4):
 
 ```hcl
@@ -27,7 +28,8 @@ resource "powerdns_record" "foobar" {
 }
 ```
 
-Here is an example creating PTR record:
+### PTR record example
+An example creating PTR record:
 
 ```hcl
 # Add PTR record to the zone
@@ -40,9 +42,17 @@ resource "powerdns_record" "foobar" {
 }
 ```
 
-PowerDNS API offers the feature to automatically create corresponding PTR record for the A/AAAA record.
-Existing PTR records with same name are replaced. If no matching reverse zone is found, resource creation will fail. 
+### Automatically set PTR record for A/AAAA records
+
+!> **Deprecation warning:** _set_ptr_ feature is set to be deprecated in PowerDNS v4.3.0
+
+PowerDNS API v4.2.0 offers a feature to automatically create corresponding PTR record for the A/AAAA record.
+Existing PTR records with the same name are replaced. If no matching reverse zone is found, resource creation will fail.
 You can use `powerdns_zone` resource to create the reverse zone.
+
+
+!> **Warning:** Using _set_ptr:true_  will not automatically remove the PTR record when A/AAAA record is deleted. You should create PTR zone using `powerdns_zone` and manage PTR records using `powerdns_record`, rather than using _set_ptr_. With upcoming _set_ptr_ deprecation, this will be the only way of maintaining PTR records **via this provider**.
+
 Here is an example of creating A record along with corresponding PTR record:
 
 ```hcl
@@ -78,6 +88,7 @@ The following arguments are supported:
 * `type` - (Required) The record type.
 * `ttl` - (Required) The TTL of the record.
 * `records` - (Required) A string list of records.
+* `set_ptr` - (Optional) [**_Deprecated in PowerDNS 4.3.0_**] A boolean (true/false), determining whether API server should automatically create PTR record in the matching reverse zone. Existing PTR records are replaced. If no matching reverse zone, an error is thrown.
 
 ### Attribute Reference
 
