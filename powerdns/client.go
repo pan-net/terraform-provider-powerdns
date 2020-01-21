@@ -592,10 +592,16 @@ func (client *Client) setServerVersion() error {
 
 	serverInfo := new(serverInfo)
 	err = json.NewDecoder(resp.Body).Decode(serverInfo)
-	if err != nil {
-		return err
+	if err == nil {
+		client.ServerVersion = serverInfo.Version
+		return nil
 	}
 
-	client.ServerVersion = serverInfo.Version
-	return nil
+	headerServerInfo := strings.SplitN(resp.Header.Get("Server"), "/", 2)
+	if len(headerServerInfo) == 2 && strings.EqualFold(headerServerInfo[0], "PowerDNS") {
+		client.ServerVersion = headerServerInfo[1]
+		return nil
+	}
+
+	return fmt.Errorf("Unable to get server version")
 }
