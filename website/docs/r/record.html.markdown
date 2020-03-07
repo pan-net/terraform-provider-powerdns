@@ -18,7 +18,7 @@ Note that PowerDNS may internally lowercase certain records (e.g. CNAME and AAAA
 For the v1 API (PowerDNS version 4):
 
 ```hcl
-# Add a record to the zone
+# Add A record to the zone
 resource "powerdns_record" "foobar" {
   zone    = "example.com."
   name    = "www.example.com."
@@ -39,6 +39,62 @@ resource "powerdns_record" "foobar" {
   type    = "PTR"
   ttl     = 300
   records = ["www.example.com."]
+}
+```
+
+### MX record example
+The following example shows, how to setup MX record with a priority of `10`.
+Please note that priority is not set as other `powerdns_record` properties; rather, it's part of the string that goes into `records` list.
+
+```hcl
+# Add MX record to the zone with priority 10
+resource "powerdns_record" "foobar" {
+  zone    = "example.com."
+  name    = "example.com."
+  type    = "MX"
+  ttl     = 300
+  records = ["10 mail1.example.com"]
+}
+```
+
+### Multiple values for the same resource record
+Sometimes there is a need to have multiple values for the same DNS resource record, e.g. two IP addresses in A record, or `spf` and `DKIM` values in a TXT record.
+
+Following examples show how to set mutliple values for A, TXT, and MX record types:
+
+```hcl
+# Add two A records for www.example.com
+resource "powerdns_record" "foobar" {
+  zone    = "example.com."
+  name    = "www.example.com."
+  type    = "A"
+  ttl     = 300
+  records = ["192.168.0.11", "192.126.0.12"]
+}
+```
+
+Similarly for the two TXT records:
+
+```hcl
+resource "powerdns_record" "foobar_txt_spf_and_dkim" {
+  zone    = "example.com."
+  name    = "example.com."
+  type    = "TXT"
+  ttl     = 60
+  records = ["\"v=spf1 mx -all\"", "\"v=DKIM1 ;k=rsa; s=email; p=Msdsdfsdfsdfsdfsdfsdfsdfsdfsdfsfdfsdfsdfsdfds\""]
+}
+```
+
+For two MX records with pritotities `10` and `20` respectively, the terraform code would look like this:
+
+```hcl
+# Add two MX records to the zone with priorities 10 and 20
+resource "powerdns_record" "foobar" {
+  zone    = "example.com."
+  name    = "example.com."
+  type    = "MX"
+  ttl     = 300
+  records = ["10 mail1.example.com", "20 mail2.example.com"]
 }
 ```
 

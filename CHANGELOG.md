@@ -6,6 +6,9 @@ FEATURES:
 FIXES:
   * **Updated client tests to test sanitizeURL directly** [GH-51]
 
+ENHANCEMENTS:
+  * **Updated documentation with examples based on user feedback** [GH-57]
+
 ## 1.3.0 (December 20, 2019)
 
 FEATURES:
