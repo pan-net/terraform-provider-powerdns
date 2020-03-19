@@ -17,9 +17,18 @@ For the v1 API (PowerDNS version 4):
 ```hcl
 # Add a zone
 resource "powerdns_zone" "foobar" {
-  name    = "example.com."
-  kind    = "Native"
+  name        = "example.com."
+  kind        = "Native"
   nameservers = ["ns1.example.com.", "ns2.example.com."]
+}
+```
+
+```hcl
+# Add a Slave zone with list of IPs configured as a master for this zone
+resource "powerdns_zone" "fubar" {
+  name     = "slave.example.com."
+  kind     = "Slave"
+  masters  = ["10.10.10.10", "20.20.20.21"]
 }
 ```
 
@@ -29,7 +38,8 @@ The following arguments are supported:
 
 * `name` - (Required) The name of zone.
 * `kind` - (Required) The kind of the zone.
-* `nameservers` - (Required) The zone nameservers.
+* `nameservers` - (Optional) The zone nameservers.
+* `masters` - (Optional) List of IP addresses configured as a master for this zone (“Slave” kind zones only)
 * `soa_edit_api` - (Optional) This should map to one of the [supported API values](https://doc.powerdns.com/authoritative/dnsupdate.html#soa-edit-dnsupdate-settings) *or* in [case you wish to remove the setting](https://doc.powerdns.com/authoritative/domainmetadata.html#soa-edit-api), set this argument as `\"\"` (that will translate to the API value `""`).
 
 ## Importing
