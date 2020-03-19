@@ -3,6 +3,7 @@ package powerdns
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
@@ -28,6 +29,9 @@ func resourcePDNSZone() *schema.Resource {
 			"kind": {
 				Type:     schema.TypeString,
 				Required: true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return strings.EqualFold(old, new)
+				},
 			},
 
 			"nameservers": {

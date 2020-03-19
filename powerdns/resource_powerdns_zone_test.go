@@ -33,6 +33,52 @@ func TestAccPDNSZoneNative(t *testing.T) {
 	})
 }
 
+func TestAccPDNSZoneNativeMixedCaps(t *testing.T) {
+	resourceName := "powerdns_zone.test-native"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			{
+				// using mixed caps config to create resource with test-native name
+				Config: testPDNSZoneConfigNativeMixedCaps,
+			},
+			{
+				// using test-native config with Native to confirm plan doesn't generate diff
+				ResourceName:       resourceName,
+				Config:             testPDNSZoneConfigNative,
+				ExpectNonEmptyPlan: false,
+				PlanOnly:           true,
+			},
+		},
+	})
+}
+
+func TestAccPDNSZoneNativeSmallCaps(t *testing.T) {
+	resourceName := "powerdns_zone.test-native"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			{
+				// using small caps config to create resource with test-native name
+				Config: testPDNSZoneConfigNativeSmallCaps,
+			},
+			{
+				// using test-native config with Native to confirm plan doesn't generate diff
+				ResourceName:       resourceName,
+				Config:             testPDNSZoneConfigNative,
+				ExpectNonEmptyPlan: false,
+				PlanOnly:           true,
+			},
+		},
+	})
+}
+
 func TestAccPDNSZoneMaster(t *testing.T) {
 	resourceName := "powerdns_zone.test-master"
 
@@ -203,6 +249,20 @@ const testPDNSZoneConfigNative = `
 resource "powerdns_zone" "test-native" {
 	name = "sysa.abc."
 	kind = "Native"
+	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
+}`
+
+const testPDNSZoneConfigNativeMixedCaps = `
+resource "powerdns_zone" "test-native" {
+	name = "sysa.abc."
+	kind = "NaTIve"
+	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
+}`
+
+const testPDNSZoneConfigNativeSmallCaps = `
+resource "powerdns_zone" "test-native" {
+	name = "sysa.abc."
+	kind = "native"
 	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
 }`
 
