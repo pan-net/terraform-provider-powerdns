@@ -67,11 +67,11 @@ func resourcePDNSZoneCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	var masters []string
-	for _, master_ip := range d.Get("masters").(*schema.Set).List() {
-		if net.ParseIP(master_ip.(string)) == nil {
-			return fmt.Errorf("Values in masters list attribute must be valid IPs.")
+	for _, masterIP := range d.Get("masters").(*schema.Set).List() {
+		if net.ParseIP(masterIP.(string)) == nil {
+			return fmt.Errorf("values in masters list attribute must be valid IPs")
 		}
-		masters = append(masters, master_ip.(string))
+		masters = append(masters, masterIP.(string))
 	}
 
 	zoneInfo := ZoneInfo{
