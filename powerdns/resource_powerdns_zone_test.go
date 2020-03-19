@@ -244,7 +244,7 @@ func TestAccPDNSZoneSlaveWithInvalidMasters(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testPDNSZoneConfigSlaveWithInvalidMasters,
-				ExpectError: regexp.MustCompile("Values in masters list attribute must be valid IPs."),
+				ExpectError: regexp.MustCompile("values in masters list attribute must be valid IPs"),
 			},
 		},
 	})
