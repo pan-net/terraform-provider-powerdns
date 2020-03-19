@@ -161,6 +161,7 @@ type ZoneInfo struct {
 	Records            []Record            `json:"records,omitempty"`
 	ResourceRecordSets []ResourceRecordSet `json:"rrsets,omitempty"`
 	Nameservers        []string            `json:"nameservers,omitempty"`
+	Masters            []string            `json:"masters,omitempty"`
 	SoaEditAPI         string              `json:"soa_edit_api"`
 }
 

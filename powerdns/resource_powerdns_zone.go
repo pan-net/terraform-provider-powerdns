@@ -3,6 +3,7 @@ package powerdns
 import (
 	"fmt"
 	"log"
+	"net"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -37,9 +38,17 @@ func resourcePDNSZone() *schema.Resource {
 			"nameservers": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				Required: true,
+				Optional: true,
 				ForceNew: true,
 			},
+
+			"masters": {
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Optional: true,
+				ForceNew: true,
+			},
+
 			"soa_edit_api": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -57,11 +66,27 @@ func resourcePDNSZoneCreate(d *schema.ResourceData, meta interface{}) error {
 		nameservers = append(nameservers, nameserver.(string))
 	}
 
+	var masters []string
+	for _, master_ip := range d.Get("masters").(*schema.Set).List() {
+		if net.ParseIP(master_ip.(string)) == nil {
+			return fmt.Errorf("Values in masters list attribute must be valid IPs.")
+		}
+		masters = append(masters, master_ip.(string))
+	}
+
 	zoneInfo := ZoneInfo{
 		Name:        d.Get("name").(string),
 		Kind:        d.Get("kind").(string),
 		Nameservers: nameservers,
 		SoaEditAPI:  d.Get("soa_edit_api").(string),
+	}
+
+	if len(masters) != 0 {
+		if strings.EqualFold(zoneInfo.Kind, "Slave") {
+			zoneInfo.Masters = masters
+		} else {
+			return fmt.Errorf("masters attribute is supported only for Slave kind")
+		}
 	}
 
 	createdZoneInfo, err := client.CreateZone(zoneInfo)
@@ -99,6 +124,10 @@ func resourcePDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 		}
 
 		d.Set("nameservers", zoneNameservers)
+	}
+
+	if strings.EqualFold(zoneInfo.Kind, "Slave") {
+		d.Set("masters", zoneInfo.Masters)
 	}
 
 	return nil

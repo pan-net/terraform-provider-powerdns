@@ -2,6 +2,7 @@ package powerdns
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -207,6 +208,62 @@ func TestAccPDNSZoneSlave(t *testing.T) {
 		},
 	})
 }
+
+func TestAccPDNSZoneSlaveWithMasters(t *testing.T) {
+	resourceName := "powerdns_zone.test-slave-with-masters"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		//CheckDestroy: testAccCheckPDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSZoneConfigSlaveWithMasters,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "slave-with-masters.sysa.abc."),
+					resource.TestCheckResourceAttr(resourceName, "kind", "Slave"),
+					resource.TestCheckResourceAttr(resourceName, "masters.1048647934", "2.2.2.2"),
+					resource.TestCheckResourceAttr(resourceName, "masters.251826590", "1.1.1.1"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccPDNSZoneSlaveWithInvalidMasters(t *testing.T) {
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      testPDNSZoneConfigSlaveWithInvalidMasters,
+				ExpectError: regexp.MustCompile("Values in masters list attribute must be valid IPs."),
+			},
+		},
+	})
+}
+
+func TestAccPDNSZoneMasterWithMasters(t *testing.T) {
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      testPDNSZoneConfigMasterWithMasters,
+				ExpectError: regexp.MustCompile("masters attribute is supported only for Slave kind"),
+			},
+		},
+	})
+}
+
 func testAccCheckPDNSZoneDestroy(s *terraform.State) error {
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "powerdns_zone" {
@@ -301,4 +358,25 @@ resource "powerdns_zone" "test-slave" {
 	name = "slave.sysa.abc."
 	kind = "Slave"
 	nameservers = []
+}`
+
+const testPDNSZoneConfigSlaveWithMasters = `
+resource "powerdns_zone" "test-slave-with-masters" {
+	name = "slave-with-masters.sysa.abc."
+	kind = "Slave"
+	masters = ["1.1.1.1", "2.2.2.2"]
+}`
+
+const testPDNSZoneConfigSlaveWithInvalidMasters = `
+resource "powerdns_zone" "test-slave-with-invalid-masters" {
+	name = "slave-with-invalid-masters.sysa.abc."
+	kind = "Slave"
+	masters = ["example.com", "2.2.2.2"]
+}`
+
+const testPDNSZoneConfigMasterWithMasters = `
+resource "powerdns_zone" "test-master-with-masters" {
+	name = "master-with-masters.sysa.abc."
+	kind = "Master"
+	masters = ["1.1.1.1", "2.2.2.2"]
 }`
