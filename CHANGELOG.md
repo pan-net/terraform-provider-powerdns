@@ -2,9 +2,11 @@
 
 FEATURES:
   * **Added ServerVersion attribute to client** [GH-52]
+  * **Added masters zone attribute for Slave zone kind** [GH-59]
 
 FIXES:
   * **Updated client tests to test sanitizeURL directly** [GH-51]
+  * **Fixed case sensitivity of kind zone attribute** [GH-58]
 
 ENHANCEMENTS:
   * **Updated documentation with examples based on user feedback** [GH-57]
