@@ -1,15 +1,15 @@
-## 1.4.0 (Unreleased)
+## 1.4.0 (April 27, 2020)
 
 FEATURES:
-  * **Added ServerVersion attribute to client** [GH-52]
-  * **Added masters zone attribute for Slave zone kind** [GH-59]
+  * **Added ServerVersion attribute to client** ([#52](https://github.com/terraform-providers/terraform-provider-powerdns/issues/52))
+  * **Added masters zone attribute for Slave zone kind** ([#59](https://github.com/terraform-providers/terraform-provider-powerdns/issues/59))
 
 FIXES:
-  * **Updated client tests to test sanitizeURL directly** [GH-51]
-  * **Fixed case sensitivity of kind zone attribute** [GH-58]
+  * **Updated client tests to test sanitizeURL directly** ([#51](https://github.com/terraform-providers/terraform-provider-powerdns/issues/51))
+  * **Fixed case sensitivity of kind zone attribute** ([#58](https://github.com/terraform-providers/terraform-provider-powerdns/issues/58))
 
 ENHANCEMENTS:
-  * **Updated documentation with examples based on user feedback** [GH-57]
+  * **Updated documentation with examples based on user feedback** ([#57](https://github.com/terraform-providers/terraform-provider-powerdns/issues/57))
 
 ## 1.3.0 (December 20, 2019)
 
@@ -49,7 +49,7 @@ NOTES:
  * provider: This release includes only a Terraform SDK upgrade with compatibility for Terraform v0.12. The provider remains backwards compatible with Terraform v0.11 and this update should have no significant changes in behavior for the provider. Please report any unexpected behavior in new GitHub issues (Terraform core: https://github.com/hashicorp/terraform/issues or Terraform PowerDNS Provider: https://github.com/terraform-providers/terraform-provider-powerdns/issues) ([#16](https://github.com/terraform-providers/terraform-provider-powerdns/issues/16))
 
 ENHANCEMENTS:
-  * Switch to go modules and Terraform v0.12 SDK [[#16](https://github.com/terraform-providers/terraform-provider-powerdns/issues/16)]
+  * Switch to go modules and Terraform v0.12 SDK ([#16](https://github.com/terraform-providers/terraform-provider-powerdns/issues/16))
 
 ## 0.2.0 (July 31, 2019)
 
