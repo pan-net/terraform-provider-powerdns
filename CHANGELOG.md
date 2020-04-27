@@ -1,4 +1,4 @@
-## 1.3.1 (Unreleased)
+## 1.4.0 (Unreleased)
 
 FEATURES:
   * **Added ServerVersion attribute to client** [GH-52]
