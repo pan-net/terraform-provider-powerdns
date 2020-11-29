@@ -236,6 +236,46 @@ func TestAccPDNSZoneSlaveWithMasters(t *testing.T) {
 	})
 }
 
+func TestAccPDNSZoneSlaveWithMastersWithPort(t *testing.T) {
+	resourceName := "powerdns_zone.test-slave-with-masters-with-port"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		//CheckDestroy: testAccCheckPDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSZoneConfigSlaveWithMastersWithPort,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "slave-with-masters-with-port.sysa.abc."),
+					resource.TestCheckResourceAttr(resourceName, "kind", "Slave"),
+					resource.TestCheckResourceAttr(resourceName, "masters.1048647934", "2.2.2.2"),
+					resource.TestCheckResourceAttr(resourceName, "masters.1686215786", "1.1.1.1:1111"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccPDNSZoneSlaveWithMastersWithInvalidPort(t *testing.T) {
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      testPDNSZoneConfigSlaveWithMastersWithInvalidPort,
+				ExpectError: regexp.MustCompile("Invalid port value in masters atribute"),
+			},
+		},
+	})
+}
 func TestAccPDNSZoneSlaveWithInvalidMasters(t *testing.T) {
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -365,6 +405,20 @@ resource "powerdns_zone" "test-slave-with-masters" {
 	name = "slave-with-masters.sysa.abc."
 	kind = "Slave"
 	masters = ["1.1.1.1", "2.2.2.2"]
+}`
+
+const testPDNSZoneConfigSlaveWithMastersWithPort = `
+resource "powerdns_zone" "test-slave-with-masters-with-port" {
+	name = "slave-with-masters-with-port.sysa.abc."
+	kind = "Slave"
+	masters = ["1.1.1.1:1111", "2.2.2.2"]
+}`
+
+const testPDNSZoneConfigSlaveWithMastersWithInvalidPort = `
+resource "powerdns_zone" "test-slave-with-masters-with-invalid-port" {
+	name = "slave-with-masters-with-invalid-port.sysa.abc."
+	kind = "Slave"
+	masters = ["1.1.1.1:111111", "2.2.2.2"]
 }`
 
 const testPDNSZoneConfigSlaveWithInvalidMasters = `

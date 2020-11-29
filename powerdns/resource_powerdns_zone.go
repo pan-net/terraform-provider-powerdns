@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -67,11 +68,28 @@ func resourcePDNSZoneCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	var masters []string
-	for _, masterIP := range d.Get("masters").(*schema.Set).List() {
-		if net.ParseIP(masterIP.(string)) == nil {
+	for _, masterIPPort := range d.Get("masters").(*schema.Set).List() {
+		splitIPPort := strings.Split(masterIPPort.(string), ":")
+		// if there are more elements
+		if len(splitIPPort) > 2 {
+			return fmt.Errorf("more than one colon in <ip>:<port> string")
+		}
+		// when there are exactly 2 elements in list, assume second is port and check the port range
+		if len(splitIPPort) == 2 {
+			port, err := strconv.Atoi(splitIPPort[1])
+			if err != nil {
+				return fmt.Errorf("Error converting port value in masters atribute")
+			}
+			if port < 1 || port > 65535 {
+				return fmt.Errorf("Invalid port value in masters atribute")
+			}
+		}
+		// no matter if string contains just IP or IP:port pair, the first element in split list will be IP
+		masterIP := splitIPPort[0]
+		if net.ParseIP(masterIP) == nil {
 			return fmt.Errorf("values in masters list attribute must be valid IPs")
 		}
-		masters = append(masters, masterIP.(string))
+		masters = append(masters, masterIPPort.(string))
 	}
 
 	zoneInfo := ZoneInfo{

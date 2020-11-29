@@ -1,4 +1,8 @@
-## 1.5.0 (Unreleased)
+## 1.4.1 (Unreleased)
+
+FIXES:
+  * **Add support for port along with IP in the masters attribute** [GH-64]
+
 ## 1.4.0 (April 27, 2020)
 
 FEATURES:
