@@ -13,6 +13,26 @@ Requirements
 -	[Terraform](https://www.terraform.io/downloads.html) 0.12.x
 -	[Go](https://golang.org/doc/install) 1.11 (to build the provider plugin)
 
+Using the Provider
+----------------------
+
+```hcl
+terraform {
+  required_providers {
+    powerdns = {
+      source = "pan-net/powerdns"
+    }
+  }
+}
+
+provider "powerdns" {
+  server_url = "https://host:port/"  # or use PDNS_SERVER_URL variable
+  api_key    = "secret"              # or use PDNS_API_KEY variable
+}
+```
+
+For detailed usage see [provider's documentation page](https://www.terraform.io/docs/providers/powerdns/index.html)
+
 Building The Provider
 ---------------------
 
@@ -35,11 +55,6 @@ $ go build
 ```
 
 This will compile and place the provider binary, `terraform-provider-powerdns`, in the current directory.
-
-Using the provider
-----------------------
-
-For detailed usage see [provider's documentation page](https://www.terraform.io/docs/providers/powerdns/index.html)
 
 Developing the Provider
 ---------------------------
