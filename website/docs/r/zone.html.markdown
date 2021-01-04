@@ -43,6 +43,20 @@ The following arguments are supported:
 * `masters` - (Optional) List of IP addresses configured as a master for this zone (“Slave” kind zones only)
 * `soa_edit_api` - (Optional) This should map to one of the [supported API values](https://doc.powerdns.com/authoritative/dnsupdate.html#soa-edit-dnsupdate-settings) *or* in [case you wish to remove the setting](https://doc.powerdns.com/authoritative/domainmetadata.html#soa-edit-api), set this argument as `\"\"` (that will translate to the API value `""`).
 
+## Attributes Reference
+
+The following attributes are exported:
+
+* `name` - The name of zone.
+* `id` - The PowerDNS id for the zone
+* `kind` - The kind of the zone.
+* `account` - The account owning the zone.
+* `nameservers` - The zone nameservers.
+* `masters` - List of IP addresses configured as a master for this zone (“Slave” kind zones only, otherwise the list has no item).
+* `serial` - The zone serial.
+* `soa` - The zone SOA.
+* `soa_edit_api` - The SOA edit API mode for the zone (https://doc.powerdns.com/authoritative/dnsupdate.html#soa-edit-dnsupdate-settings).
+
 ## Importing
 
 An existing zone can be imported into this resource by supplying the zone name. If the zone is not found, an error will be returned.

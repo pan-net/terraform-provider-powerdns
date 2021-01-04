@@ -59,6 +59,18 @@ func resourcePDNSZone() *schema.Resource {
 				ForceNew: true,
 			},
 
+			"serial": {
+				Type:     schema.TypeInt,
+				Computed: true,
+				ForceNew: false,
+			},
+
+			"soa": {
+				Type:     schema.TypeString,
+				Computed: true,
+				ForceNew: false,
+			},
+
 			"soa_edit_api": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -139,6 +151,7 @@ func resourcePDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("name", zoneInfo.Name)
 	d.Set("kind", zoneInfo.Kind)
 	d.Set("account", zoneInfo.Account)
+	d.Set("serial", zoneInfo.Serial)
 	d.Set("soa_edit_api", zoneInfo.SoaEditAPI)
 
 	if zoneInfo.Kind != "Slave" {
@@ -153,7 +166,22 @@ func resourcePDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 		}
 
 		d.Set("nameservers", zoneNameservers)
+
 	}
+
+	soarecord, err := client.ListRecordsInRRSet(zoneInfo.Name, zoneInfo.Name, "SOA")
+	if err != nil {
+		return fmt.Errorf("couldn't fetch zone %s SOA from PowerDNS: %v", zoneInfo.Name, err)
+	}
+
+	var zoneSOA []string
+	for _, soa := range soarecord {
+		zoneSOA = append(zoneSOA, soa.Content)
+	}
+
+	zoneSOAStr := strings.Join(zoneSOA, "")
+
+	d.Set("soa", zoneSOAStr)
 
 	if strings.EqualFold(zoneInfo.Kind, "Slave") {
 		d.Set("masters", zoneInfo.Masters)

@@ -34,7 +34,9 @@ func Provider() terraform.ResourceProvider {
 				Description: "Content or path of a Root CA to be used to verify PowerDNS's SSL certificate",
 			},
 		},
-
+		DataSourcesMap: map[string]*schema.Resource{
+			"powerdns_zone": dataPDNSZone(),
+		},
 		ResourcesMap: map[string]*schema.Resource{
 			"powerdns_zone":   resourcePDNSZone(),
 			"powerdns_record": resourcePDNSRecord(),
