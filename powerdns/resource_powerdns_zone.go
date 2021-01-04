@@ -49,7 +49,6 @@ func resourcePDNSZone() *schema.Resource {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
-				ForceNew: true,
 			},
 
 			"masters": {
@@ -141,7 +140,7 @@ func resourcePDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("account", zoneInfo.Account)
 	d.Set("soa_edit_api", zoneInfo.SoaEditAPI)
 
-	if zoneInfo.Kind != "Slave" {
+	if zoneInfo.Kind != "Slave" && len(d.Get("nameservers").(*schema.Set).List()) > 0 {
 		nameservers, err := client.ListRecordsInRRSet(zoneInfo.Name, zoneInfo.Name, "NS")
 		if err != nil {
 			return fmt.Errorf("couldn't fetch zone %s nameservers from PowerDNS: %v", zoneInfo.Name, err)
@@ -168,15 +167,62 @@ func resourcePDNSZoneUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*Client)
 
 	zoneInfo := ZoneInfo{}
-	shouldUpdate := false
 	if d.HasChange("kind") {
 		zoneInfo.Kind = d.Get("kind").(string)
-		shouldUpdate = true
+		c := client.UpdateZone(d.Id(), zoneInfo)
+
+		if c != nil {
+			return c
+		}
 	}
 
-	if shouldUpdate {
-		return client.UpdateZone(d.Id(), zoneInfo)
+	if d.HasChange("nameservers") {
+		nameservers := d.Get("nameservers").(*schema.Set).List()
+		zone := d.Get("name").(string)
+
+		if len(nameservers) > 0 {
+			nsTTL := 0
+			nsRecords, _ := client.ListRecordsInRRSet(zone, zone, "NS")
+
+			if len(nsRecords) > 0 {
+				nsTTL = nsRecords[0].TTL
+			} else {
+				soaRecord, _ := client.ListRecordsInRRSet(zone, zone, "SOA")
+				nsTTL = soaRecord[0].TTL
+			}
+
+			rrSet := ResourceRecordSet{
+				Name: d.Get("name").(string),
+				Type: "NS",
+				TTL:  nsTTL,
+			}
+
+			records := make([]Record, 0, len(nameservers))
+			for _, recContent := range nameservers {
+				records = append(records,
+					Record{Name: rrSet.Name,
+						Type:    rrSet.Type,
+						TTL:     nsTTL,
+						Content: recContent.(string),
+						SetPtr:  false})
+			}
+
+			rrSet.Records = records
+
+			log.Printf("[DEBUG] Updating PowerDNS NS Record: %#v", rrSet)
+
+			_, err := client.ReplaceRecordSet(d.Get("name").(string), rrSet)
+			if err != nil {
+				return fmt.Errorf("Failed to update PowerDNS NS Record: %s", err)
+			}
+		} else {
+			err := client.DeleteRecordSet(zone, zone, "NS")
+			if err != nil {
+				return fmt.Errorf("Failed to remove PowerDNS NS Record: %s", err)
+			}
+		}
 	}
+	resourcePDNSZoneRead(d, meta)
 	return nil
 }
 
