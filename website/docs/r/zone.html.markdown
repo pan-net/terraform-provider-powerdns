@@ -38,6 +38,7 @@ The following arguments are supported:
 
 * `name` - (Required) The name of zone.
 * `kind` - (Required) The kind of the zone.
+* `account` - (Optional) The account owning the zone. (Default to "admin")
 * `nameservers` - (Optional) The zone nameservers.
 * `masters` - (Optional) List of IP addresses configured as a master for this zone (“Slave” kind zones only)
 * `soa_edit_api` - (Optional) This should map to one of the [supported API values](https://doc.powerdns.com/authoritative/dnsupdate.html#soa-edit-dnsupdate-settings) *or* in [case you wish to remove the setting](https://doc.powerdns.com/authoritative/domainmetadata.html#soa-edit-api), set this argument as `\"\"` (that will translate to the API value `""`).

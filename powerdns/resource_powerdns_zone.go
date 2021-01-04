@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func resourcePDNSZone() *schema.Resource {
@@ -34,6 +35,14 @@ func resourcePDNSZone() *schema.Resource {
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
 					return strings.EqualFold(old, new)
 				},
+			},
+
+			"account": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "admin",
+				ForceNew:     false,
+				ValidateFunc: validation.StringLenBetween(0, 40),
 			},
 
 			"nameservers": {
@@ -95,6 +104,7 @@ func resourcePDNSZoneCreate(d *schema.ResourceData, meta interface{}) error {
 	zoneInfo := ZoneInfo{
 		Name:        d.Get("name").(string),
 		Kind:        d.Get("kind").(string),
+		Account:     d.Get("account").(string),
 		Nameservers: nameservers,
 		SoaEditAPI:  d.Get("soa_edit_api").(string),
 	}
@@ -128,6 +138,7 @@ func resourcePDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("name", zoneInfo.Name)
 	d.Set("kind", zoneInfo.Kind)
+	d.Set("account", zoneInfo.Account)
 	d.Set("soa_edit_api", zoneInfo.SoaEditAPI)
 
 	if zoneInfo.Kind != "Slave" {
