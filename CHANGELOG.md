@@ -1,7 +1,15 @@
-## 1.4.1 (Unreleased)
+## 1.4.1 (January 21, 2021)
+
+FEATURES:
+  * **Added PowerDNS Zone Account support**  ([#71](https://github.com/pan-net/terraform-provider-powerdns/issues/71), @jbe-dw)
 
 FIXES:
-  * **Add support for port along with IP in the masters attribute** [GH-64]
+  * **Added support for port along with IP in the masters attribute** ([#64](https://github.com/pan-net/terraform-provider-powerdns/issues/64), @mbag)
+
+ENHANCEMENTS:
+
+  * **Add note in documentation about usage of SQLite3** ([#75](https://github.com/pan-net/terraform-provider-powerdns/issues/75), @dkowis)
+  * **Improve _Using_ section in README** ([#67](https://github.com/pan-net/terraform-provider-powerdns/pull/67), @Nowaker)
 
 ## 1.4.0 (April 27, 2020)
 
