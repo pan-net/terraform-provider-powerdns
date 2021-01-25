@@ -184,6 +184,87 @@ func TestAccPDNSZoneMasterSOAAPIEDITUndefined(t *testing.T) {
 	})
 }
 
+func TestAccPDNSZoneAccount(t *testing.T) {
+	resourceName := "powerdns_zone.test-account"
+	resourceAccount := `test`
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSZoneConfigAccount,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "account.sysa.abc."),
+					resource.TestCheckResourceAttr(resourceName, "kind", "Master"),
+					resource.TestCheckResourceAttr(resourceName, "account", resourceAccount),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccPDNSZoneAccountEmpty(t *testing.T) {
+	resourceName := "powerdns_zone.test-account-empty"
+	resourceAccount := ``
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSZoneConfigAccountEmpty,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "account-empty.sysa.abc."),
+					resource.TestCheckResourceAttr(resourceName, "kind", "Master"),
+					resource.TestCheckResourceAttr(resourceName, "account", resourceAccount),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccPDNSZoneAccountUndefined(t *testing.T) {
+	resourceName := "powerdns_zone.test-account-undefined"
+	resourceAccount := `admin`
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSZoneConfigAccountUndefined,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "account-undefined.sysa.abc."),
+					resource.TestCheckResourceAttr(resourceName, "kind", "Master"),
+					resource.TestCheckResourceAttr(resourceName, "account", resourceAccount),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccPDNSZoneSlave(t *testing.T) {
 	resourceName := "powerdns_zone.test-slave"
 
@@ -391,6 +472,30 @@ resource "powerdns_zone" "test-master-soa-edit-api-undefined" {
 	name = "master-soa-edit-api-undefined.sysa.abc."
 	kind = "Master"
 	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
+}`
+
+const testPDNSZoneConfigAccount = `
+resource "powerdns_zone" "test-account" {
+	name = "account.sysa.abc."
+	kind = "Master"
+	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
+	account = "test"
+}`
+
+const testPDNSZoneConfigAccountEmpty = `
+resource "powerdns_zone" "test-account-empty" {
+	name = "account-empty.sysa.abc."
+	kind = "Master"
+	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
+	account = ""
+}`
+
+const testPDNSZoneConfigAccountUndefined = `
+resource "powerdns_zone" "test-account-undefined" {
+	name = "account-undefined.sysa.abc."
+	kind = "Master"
+	nameservers = ["ns1.sysa.abc.", "ns2.sysa.abc."]
+	soa_edit_api = "DEFAULT"
 }`
 
 const testPDNSZoneConfigSlave = `

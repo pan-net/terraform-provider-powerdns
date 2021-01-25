@@ -160,6 +160,7 @@ type ZoneInfo struct {
 	Serial             int64               `json:"serial"`
 	Records            []Record            `json:"records,omitempty"`
 	ResourceRecordSets []ResourceRecordSet `json:"rrsets,omitempty"`
+	Account            string              `json:"account"`
 	Nameservers        []string            `json:"nameservers,omitempty"`
 	Masters            []string            `json:"masters,omitempty"`
 	SoaEditAPI         string              `json:"soa_edit_api"`
