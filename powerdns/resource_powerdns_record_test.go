@@ -11,10 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-//
-// Tests
-//
-
 func TestAccPDNSRecord_Empty(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
@@ -29,7 +25,7 @@ func TestAccPDNSRecord_Empty(t *testing.T) {
 }
 
 func TestAccPDNSRecord_A(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigA())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigA)
 }
 
 func TestAccPDNSRecord_WithPtr(t *testing.T) {
@@ -92,59 +88,59 @@ func TestAccPDNSRecord_WithCount(t *testing.T) {
 }
 
 func TestAccPDNSRecord_AAAA(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigAAAA())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigAAAA)
 }
 
 func TestAccPDNSRecord_CNAME(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigCNAME())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigCNAME)
 }
 
 func TestAccPDNSRecord_HINFO(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigHINFO())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigHINFO)
 }
 
 func TestAccPDNSRecord_LOC(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigLOC())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigLOC)
 }
 
 func TestAccPDNSRecord_MX(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigMX())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigMX)
 }
 
 func TestAccPDNSRecord_MXMulti(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigMXMulti())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigMXMulti)
 }
 
 func TestAccPDNSRecord_NAPTR(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigNAPTR())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigNAPTR)
 }
 
 func TestAccPDNSRecord_NS(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigNS())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigNS)
 }
 
 func TestAccPDNSRecord_SPF(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigSPF())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigSPF)
 }
 
 func TestAccPDNSRecord_SSHFP(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigSSHFP())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigSSHFP)
 }
 
 func TestAccPDNSRecord_SRV(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigSRV())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigSRV)
 }
 
 func TestAccPDNSRecord_TXT(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigTXT())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigTXT)
 }
 
 func TestAccPDNSRecord_ALIAS(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigALIAS())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigALIAS)
 }
 
 func TestAccPDNSRecord_SOA(t *testing.T) {
-	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigSOA())
+	testPDNSRecordCommonTestCore(t, testPDNSRecordConfigSOA)
 }
 
 //
@@ -161,7 +157,9 @@ type PowerDNSRecordResourceArguments struct {
 	Type    string
 	TTL     int
 	Records []string
-	SetPtr  bool
+	// UpdateRecords are recordsets used for testing update behavior.
+	UpdateRecords []string
+	SetPtr        bool
 }
 
 type PowerDNSRecordResource struct {
@@ -207,16 +205,45 @@ func (resourceConfig *PowerDNSRecordResource) ResourceID() string {
 //
 // Test Helper Functions
 //
-func testPDNSRecordCommonTestCore(t *testing.T, recordConfig *PowerDNSRecordResource) {
+
+// Common Test Core: This function builds a create / update test for the majority of test cases
+// Takes a function variable to avoid deep copy issues on updates.
+func testPDNSRecordCommonTestCore(t *testing.T, recordConfigGenerator func() *PowerDNSRecordResource) {
+	// Update test resources.
+	recordConfig := recordConfigGenerator()
+
+	ttlUpdateRecordConfig := recordConfigGenerator()
+	ttlUpdateRecordConfig.Arguments.TTL += 100
+
+	recordUpdateRecordConfig := recordConfigGenerator()
+	recordUpdateRecordConfig.Arguments.Records = recordUpdateRecordConfig.Arguments.UpdateRecords
+
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
 		Steps: []resource.TestStep{
+			// Initial record creation
 			{
 				Config: recordConfig.ResourceDeclaration(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckPDNSRecordContents(recordConfig),
+					// TestCheckResourceAttr() checks are skipped because records is not directly accessible
+					// https://github.com/hashicorp/terraform/issues/21618
+				),
+			},
+			// TTL update
+			{
+				Config: ttlUpdateRecordConfig.ResourceDeclaration(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSRecordContents(ttlUpdateRecordConfig),
+				),
+			},
+			// Records update
+			{
+				Config: recordUpdateRecordConfig.ResourceDeclaration(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSRecordContents(recordUpdateRecordConfig),
 				),
 			},
 			{
@@ -370,6 +397,9 @@ func testPDNSRecordConfigA() *PowerDNSRecordResource {
 	record.Arguments.Type = "A"
 	record.Arguments.Records = append(record.Arguments.Records, "1.1.1.1")
 	record.Arguments.Records = append(record.Arguments.Records, "2.2.2.2")
+
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "2.2.2.2")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "3.3.3.3")
 	return record
 }
 
@@ -379,6 +409,7 @@ func testPDNSRecordConfigAWithPtr() *PowerDNSRecordResource {
 	record.Arguments.Name = "testpdnsrecordconfigrecordawithptr.sysa.xyz."
 	record.Arguments.Type = "A"
 	record.Arguments.Records = append(record.Arguments.Records, "1.1.1.1")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "2.2.2.2")
 	record.Arguments.SetPtr = true
 	return record
 }
@@ -400,6 +431,8 @@ func testPDNSRecordConfigAAAA() *PowerDNSRecordResource {
 	record.Arguments.Type = "AAAA"
 	record.Arguments.Records = append(record.Arguments.Records, "2001:db8:2000:bf0::1")
 	record.Arguments.Records = append(record.Arguments.Records, "2001:db8:2000:bf1::1")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "2001:db8:2000:bf3::1")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "2001:db8:2000:bf4::1")
 	return record
 }
 
@@ -409,6 +442,7 @@ func testPDNSRecordConfigCNAME() *PowerDNSRecordResource {
 	record.Arguments.Name = "testpdnsrecordconfigcname.sysa.xyz."
 	record.Arguments.Type = "CNAME"
 	record.Arguments.Records = append(record.Arguments.Records, "redis.example.com.")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "redis.example.net.")
 	return record
 }
 
@@ -418,6 +452,7 @@ func testPDNSRecordConfigHINFO() *PowerDNSRecordResource {
 	record.Arguments.Name = "testpdnsrecordconfighinfo.sysa.xyz."
 	record.Arguments.Type = "HINFO"
 	record.Arguments.Records = append(record.Arguments.Records, `"PC-Intel-2.4ghz" "Linux"`)
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, `"PC-Intel-3.2ghz" "Linux"`)
 	return record
 }
 
@@ -427,6 +462,7 @@ func testPDNSRecordConfigLOC() *PowerDNSRecordResource {
 	record.Arguments.Name = "testpdnsrecordconfigloc.sysa.xyz."
 	record.Arguments.Type = "LOC"
 	record.Arguments.Records = append(record.Arguments.Records, "51 56 0.123 N 5 54 0.000 E 4.00m 1.00m 10000.00m 10.00m")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "51 10 43.900 N 1 49 34.300 E 4.00m 1.00m 10000.00m 10.00m")
 	return record
 }
 
@@ -436,6 +472,7 @@ func testPDNSRecordConfigMX() *PowerDNSRecordResource {
 	record.Arguments.Name = "sysa.xyz."
 	record.Arguments.Type = "MX"
 	record.Arguments.Records = append(record.Arguments.Records, "10 mail.example.com.")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "10 mail2.example.net.")
 	return record
 }
 
@@ -446,6 +483,8 @@ func testPDNSRecordConfigMXMulti() *PowerDNSRecordResource {
 	record.Arguments.Type = "MX"
 	record.Arguments.Records = append(record.Arguments.Records, "10 mail.example.com.")
 	record.Arguments.Records = append(record.Arguments.Records, "20 mail2.example.com.")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "10 mail3.example.com.")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "10 mail4.example.com.")
 	return record
 }
 
@@ -455,6 +494,7 @@ func testPDNSRecordConfigNAPTR() *PowerDNSRecordResource {
 	record.Arguments.Name = "sysa.xyz."
 	record.Arguments.Type = "NAPTR"
 	record.Arguments.Records = append(record.Arguments.Records, `100 50 "s" "z3950+I2L+I2C" "" _z3950._tcp.gatech.edu'.`)
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, `100 70 "s" "z3950+I2L+I2C" "" _z3950._tcp.gatech.edu'.`)
 	return record
 }
 
@@ -465,6 +505,8 @@ func testPDNSRecordConfigNS() *PowerDNSRecordResource {
 	record.Arguments.Type = "NS"
 	record.Arguments.Records = append(record.Arguments.Records, "ns1.sysa.xyz.")
 	record.Arguments.Records = append(record.Arguments.Records, "ns2.sysa.xyz.")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "ns3.sysa.xyz.")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "ns4.sysa.xyz.")
 	return record
 }
 
@@ -474,6 +516,7 @@ func testPDNSRecordConfigSPF() *PowerDNSRecordResource {
 	record.Arguments.Name = "sysa.xyz."
 	record.Arguments.Type = "SPF"
 	record.Arguments.Records = append(record.Arguments.Records, `"v=spf1 +all"`)
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, `"v=spf1 -all"`)
 	return record
 }
 
@@ -483,6 +526,7 @@ func testPDNSRecordConfigSSHFP() *PowerDNSRecordResource {
 	record.Arguments.Name = "ssh.sysa.xyz."
 	record.Arguments.Type = "SSHFP"
 	record.Arguments.Records = append(record.Arguments.Records, "1 1 123456789abcdef67890123456789abcdef67890")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "1 1 fedcba9876543210fedcba9876543210fedcba98")
 	return record
 }
 
@@ -494,6 +538,11 @@ func testPDNSRecordConfigSRV() *PowerDNSRecordResource {
 	record.Arguments.Records = append(record.Arguments.Records, "0 10 6379 redis1.sysa.xyz.")
 	record.Arguments.Records = append(record.Arguments.Records, "0 10 6379 redis2.sysa.xyz.")
 	record.Arguments.Records = append(record.Arguments.Records, "10 10 6379 redis-replica.sysa.xyz.")
+
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "0 10 6379 redis1.sysa.xyz.")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "0 10 6379 redis2.sysa.xyz.")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "0 10 6379 redis3.sysa.xyz.")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "10 10 6379 redis-replica.sysa.xyz.")
 	return record
 }
 
@@ -503,6 +552,7 @@ func testPDNSRecordConfigTXT() *PowerDNSRecordResource {
 	record.Arguments.Name = "text.sysa.xyz."
 	record.Arguments.Type = "TXT"
 	record.Arguments.Records = append(record.Arguments.Records, `"text record payload"`)
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, `"updated text record payload"`)
 	return record
 }
 
@@ -513,6 +563,7 @@ func testPDNSRecordConfigALIAS() *PowerDNSRecordResource {
 	record.Arguments.Type = "ALIAS"
 	record.Arguments.TTL = 3600
 	record.Arguments.Records = append(record.Arguments.Records, "www.some-alias.com.")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "www.some-other-alias.com.")
 	return record
 }
 
@@ -524,5 +575,6 @@ func testPDNSRecordConfigSOA() *PowerDNSRecordResource {
 	record.Arguments.Type = "SOA"
 	record.Arguments.TTL = 3600
 	record.Arguments.Records = append(record.Arguments.Records, "something.something. hostmaster.sysa.xyz. 2019090301 10800 3600 604800 3600")
+	record.Arguments.UpdateRecords = append(record.Arguments.UpdateRecords, "something.something. hostmaster.sysa.xyz. 2021021801 10800 3600 604800 3600")
 	return record
 }
