@@ -1,7 +1,7 @@
 # Golang CircleCI 2.0 configuration file
 #
 # Check https://circleci.com/docs/2.0/language-go/ for more details
-version: 2
+version: 2.0
 jobs:
   build:
     docker:
@@ -14,14 +14,14 @@ jobs:
       - image: circleci/golang:1.9
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
-      - lint 
+      - build 
       - run: make lint
   unit_tests:
     docker:
       - image: circleci/golang:1.9
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
-      - test
+      - build
       - run: make test
 # Orchestrate our job run sequence
 workflows:
