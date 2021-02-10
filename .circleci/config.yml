@@ -7,21 +7,18 @@ jobs:
     docker:
       - image: circleci/golang:1.9
     steps:
-      - build
       - run: make build
   lint:
     docker:
       - image: circleci/golang:1.9
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
-      - build 
       - run: make lint
   unit_tests:
     docker:
       - image: circleci/golang:1.9
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
-      - build
       - run: make test
 # Orchestrate our job run sequence
 workflows:
