@@ -49,6 +49,12 @@ func resourcePDNSZone() *schema.Resource {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					if len(old) == 0 {
+						return false
+					}
+					return true
+				},
 			},
 
 			"masters": {
@@ -140,7 +146,7 @@ func resourcePDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("account", zoneInfo.Account)
 	d.Set("soa_edit_api", zoneInfo.SoaEditAPI)
 
-	if zoneInfo.Kind != "Slave" && len(d.Get("nameservers").(*schema.Set).List()) > 0 {
+	if zoneInfo.Kind != "Slave" {
 		nameservers, err := client.ListRecordsInRRSet(zoneInfo.Name, zoneInfo.Name, "NS")
 		if err != nil {
 			return fmt.Errorf("couldn't fetch zone %s nameservers from PowerDNS: %v", zoneInfo.Name, err)
