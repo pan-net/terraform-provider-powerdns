@@ -18,6 +18,7 @@ jobs:
   unit_tests:
     docker:
       - image: circleci/golang:1.9
+    working_directory: /go/src/github.com/pan-net/terraform-provider-powerdns
     steps:
       - checkout
       - run: make test
