@@ -33,6 +33,18 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("PDNS_CACERT", ""),
 				Description: "Content or path of a Root CA to be used to verify PowerDNS's SSL certificate",
 			},
+			"cache_requests": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("PDNS_CACHE_REQUESTS", false),
+				Description: "Enable cache REST API requests",
+			},
+			"cache_mem_size": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("PDNS_CACHE_MEM_SIZE", "100"),
+				Description: "Set cache memory size in Mb",
+			},
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -46,10 +58,12 @@ func Provider() terraform.ResourceProvider {
 
 func providerConfigure(data *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		APIKey:        data.Get("api_key").(string),
-		ServerURL:     data.Get("server_url").(string),
-		InsecureHTTPS: data.Get("insecure_https").(bool),
-		CACertificate: data.Get("ca_certificate").(string),
+		APIKey:          data.Get("api_key").(string),
+		ServerURL:       data.Get("server_url").(string),
+		InsecureHTTPS:   data.Get("insecure_https").(bool),
+		CACertificate:   data.Get("ca_certificate").(string),
+		CacheEnable:     data.Get("cache_requests").(bool),
+		CacheMemorySize: data.Get("cache_mem_size").(string),
 	}
 
 	return config.Client()

@@ -11,12 +11,16 @@ import (
 	"strconv"
 	"strings"
 
+	freecache "github.com/coocood/freecache"
 	cleanhttp "github.com/hashicorp/go-cleanhttp"
 )
 
 // DefaultSchema is the value used for the URL in case
 // no schema is explicitly defined
 var DefaultSchema = "https"
+
+// DefaultCacheSize is client default cache size
+var DefaultCacheSize int
 
 // Client is a PowerDNS client representation
 type Client struct {
@@ -25,10 +29,12 @@ type Client struct {
 	APIKey        string // REST API Static authentication key
 	APIVersion    int    // API version to use
 	HTTP          *http.Client
+	CacheEnable   bool // Enable/Disable chache for REST API requests
+	Cache         *freecache.Cache
 }
 
 // NewClient returns a new PowerDNS client
-func NewClient(serverURL string, apiKey string, configTLS *tls.Config) (*Client, error) {
+func NewClient(serverURL string, apiKey string, configTLS *tls.Config, cacheEnable bool, cacheSizeMB string) (*Client, error) {
 
 	cleanURL, err := sanitizeURL(serverURL)
 
@@ -39,11 +45,21 @@ func NewClient(serverURL string, apiKey string, configTLS *tls.Config) (*Client,
 		return nil, fmt.Errorf("Error while creating client: %s", err)
 	}
 
+	if cacheEnable {
+		cacheSize, err := strconv.Atoi(cacheSizeMB)
+		if err != nil {
+			return nil, fmt.Errorf("Error while creating client: %s", err)
+		}
+		DefaultCacheSize = cacheSize * 1024 * 1024
+	}
+
 	client := Client{
-		ServerURL:  cleanURL,
-		APIKey:     apiKey,
-		HTTP:       httpClient,
-		APIVersion: -1,
+		ServerURL:   cleanURL,
+		APIKey:      apiKey,
+		HTTP:        httpClient,
+		APIVersion:  -1,
+		CacheEnable: cacheEnable,
+		Cache:       freecache.NewCache(DefaultCacheSize),
 	}
 
 	if err := client.setServerVersion(); err != nil {
@@ -420,23 +436,55 @@ func (client *Client) DeleteZone(name string) error {
 	return nil
 }
 
+// GetZoneInfoFromCache return ZoneInfo struct
+func (client *Client) GetZoneInfoFromCache(zone string) (*ZoneInfo, error) {
+	if client.CacheEnable {
+		cacheZoneInfo, err := client.Cache.Get([]byte(zone))
+
+		if err != nil {
+			return nil, err
+		}
+		zoneInfo := new(ZoneInfo)
+		json.Unmarshal(cacheZoneInfo, &zoneInfo)
+		return zoneInfo, err
+	}
+	return nil, nil
+}
+
 // ListRecords returns all records in Zone
 func (client *Client) ListRecords(zone string) ([]Record, error) {
-	req, err := client.newRequest("GET", fmt.Sprintf("/servers/localhost/zones/%s", zone), nil)
-	if err != nil {
-		return nil, err
-	}
+	zoneInfo, _ := client.GetZoneInfoFromCache(zone)
 
-	resp, err := client.HTTP.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	if zoneInfo == nil {
+		req, err := client.newRequest("GET", fmt.Sprintf("/servers/localhost/zones/%s", zone), nil)
+		if err != nil {
+			return nil, err
+		}
 
-	zoneInfo := new(ZoneInfo)
-	err = json.NewDecoder(resp.Body).Decode(zoneInfo)
-	if err != nil {
-		return nil, err
+		resp, err := client.HTTP.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		zoneInfo = new(ZoneInfo)
+		err = json.NewDecoder(resp.Body).Decode(zoneInfo)
+		if err != nil {
+			return nil, err
+		}
+
+		if client.CacheEnable {
+			cacheValue, err := json.Marshal(zoneInfo)
+			if err != nil {
+				return nil, err
+			}
+			// Default cache ttl is 30 sec, I think that is enough
+			err = client.Cache.Set([]byte(zone), cacheValue, 30)
+			if err != nil {
+				return nil, fmt.Errorf("The cache for REST API requests is enabled but the size isn't enough: cacheSize: %db \n %s",
+					DefaultCacheSize, err)
+			}
+		}
 	}
 
 	records := zoneInfo.Records
