@@ -43,7 +43,13 @@ func Provider() terraform.ResourceProvider {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("PDNS_CACHE_MEM_SIZE", "100"),
-				Description: "Set cache memory size in Mb",
+				Description: "Set cache memory size in MB",
+			},
+			"cache_ttl": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("PDNS_CACHE_TTL", 30),
+				Description: "Set cache TTL in seconds",
 			},
 		},
 
@@ -64,6 +70,7 @@ func providerConfigure(data *schema.ResourceData) (interface{}, error) {
 		CACertificate:   data.Get("ca_certificate").(string),
 		CacheEnable:     data.Get("cache_requests").(bool),
 		CacheMemorySize: data.Get("cache_mem_size").(string),
+		CacheTTL:        data.Get("cache_ttl").(int),
 	}
 
 	return config.Client()

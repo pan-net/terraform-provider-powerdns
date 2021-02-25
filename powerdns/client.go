@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -31,10 +32,11 @@ type Client struct {
 	HTTP          *http.Client
 	CacheEnable   bool // Enable/Disable chache for REST API requests
 	Cache         *freecache.Cache
+	CacheTTL      int
 }
 
 // NewClient returns a new PowerDNS client
-func NewClient(serverURL string, apiKey string, configTLS *tls.Config, cacheEnable bool, cacheSizeMB string) (*Client, error) {
+func NewClient(serverURL string, apiKey string, configTLS *tls.Config, cacheEnable bool, cacheSizeMB string, cacheTTL int) (*Client, error) {
 
 	cleanURL, err := sanitizeURL(serverURL)
 
@@ -60,6 +62,7 @@ func NewClient(serverURL string, apiKey string, configTLS *tls.Config, cacheEnab
 		APIVersion:  -1,
 		CacheEnable: cacheEnable,
 		Cache:       freecache.NewCache(DefaultCacheSize),
+		CacheTTL:    cacheTTL,
 	}
 
 	if err := client.setServerVersion(); err != nil {
@@ -440,12 +443,16 @@ func (client *Client) DeleteZone(name string) error {
 func (client *Client) GetZoneInfoFromCache(zone string) (*ZoneInfo, error) {
 	if client.CacheEnable {
 		cacheZoneInfo, err := client.Cache.Get([]byte(zone))
-
 		if err != nil {
 			return nil, err
 		}
+
 		zoneInfo := new(ZoneInfo)
-		json.Unmarshal(cacheZoneInfo, &zoneInfo)
+		err = json.Unmarshal(cacheZoneInfo, &zoneInfo)
+		if err != nil {
+			return nil, err
+		}
+
 		return zoneInfo, err
 	}
 	return nil, nil
@@ -453,7 +460,10 @@ func (client *Client) GetZoneInfoFromCache(zone string) (*ZoneInfo, error) {
 
 // ListRecords returns all records in Zone
 func (client *Client) ListRecords(zone string) ([]Record, error) {
-	zoneInfo, _ := client.GetZoneInfoFromCache(zone)
+	zoneInfo, err := client.GetZoneInfoFromCache(zone)
+	if err != nil {
+		log.Printf("[WARN] module.freecache: %s: %s", zone, err)
+	}
 
 	if zoneInfo == nil {
 		req, err := client.newRequest("GET", fmt.Sprintf("/servers/localhost/zones/%s", zone), nil)
@@ -478,8 +488,8 @@ func (client *Client) ListRecords(zone string) ([]Record, error) {
 			if err != nil {
 				return nil, err
 			}
-			// Default cache ttl is 30 sec, I think that is enough
-			err = client.Cache.Set([]byte(zone), cacheValue, 30)
+
+			err = client.Cache.Set([]byte(zone), cacheValue, client.CacheTTL)
 			if err != nil {
 				return nil, fmt.Errorf("The cache for REST API requests is enabled but the size isn't enough: cacheSize: %db \n %s",
 					DefaultCacheSize, err)
