@@ -2,6 +2,7 @@ package powerdns
 
 import (
 	"fmt"
+	"hash/crc32"
 	"regexp"
 	"strconv"
 	"strings"
@@ -144,65 +145,6 @@ func TestAccPDNSRecord_SOA(t *testing.T) {
 }
 
 //
-// Test resource declaration functions
-//
-// Pattern: testPDNSRecordConfigXXX() returns a PowerDNSRecordResource struct
-// The PowerDNSRecordResource struct can be used to query test config, update attributes for update tests,
-// and can have ResourceDeclaration() called against it to generate the Terraform DSL resource block string.
-//
-type PowerDNSRecordResourceArguments struct {
-	Count   int
-	Zone    string
-	Name    string
-	Type    string
-	TTL     int
-	Records []string
-	// UpdateRecords are recordsets used for testing update behavior.
-	UpdateRecords []string
-	SetPtr        bool
-}
-
-type PowerDNSRecordResource struct {
-	Name      string
-	Arguments *PowerDNSRecordResourceArguments
-}
-
-func (resourceConfig *PowerDNSRecordResource) ResourceDeclaration() string {
-	var encapsulatedRecords []string
-	for _, record := range resourceConfig.Arguments.Records {
-		encapsulatedRecords = append(encapsulatedRecords, (`"` + strings.Replace(record, `"`, `\"`, -1) + `"`))
-	}
-
-	resourceDeclaration := `resource "powerdns_record" "` + resourceConfig.Name + "\" {\n"
-	if resourceConfig.Arguments.Count > 0 {
-		resourceDeclaration += "  count = " + strconv.Itoa(resourceConfig.Arguments.Count) + "\n"
-	}
-
-	// zone, name, type, ttl, and records are mandatory
-	resourceDeclaration += `  zone = "` + resourceConfig.Arguments.Zone + "\"\n"
-	resourceDeclaration += `  name = "` + resourceConfig.Arguments.Name + "\"\n"
-	resourceDeclaration += `  type = "` + resourceConfig.Arguments.Type + "\"\n"
-	resourceDeclaration += "  ttl = " + strconv.Itoa(resourceConfig.Arguments.TTL) + "\n"
-	resourceDeclaration += "  records = [ " + strings.Join(encapsulatedRecords, ", ") + " ]\n"
-
-	if resourceConfig.Arguments.SetPtr {
-		resourceDeclaration += "  set_ptr = true\n"
-	}
-
-	resourceDeclaration += "}"
-
-	return resourceDeclaration
-}
-
-func (resourceConfig *PowerDNSRecordResource) ResourceName() string {
-	return "powerdns_record." + resourceConfig.Name
-}
-
-func (resourceConfig *PowerDNSRecordResource) ResourceID() string {
-	return `{"zone":"` + resourceConfig.Arguments.Zone + `","id":"` + resourceConfig.Arguments.Name + ":::" + resourceConfig.Arguments.Type + `"}`
-}
-
-//
 // Test Helper Functions
 //
 
@@ -212,39 +154,22 @@ func testPDNSRecordCommonTestCore(t *testing.T, recordConfigGenerator func() *Po
 	// Update test resources.
 	recordConfig := recordConfigGenerator()
 
-	ttlUpdateRecordConfig := recordConfigGenerator()
-	ttlUpdateRecordConfig.Arguments.TTL += 100
-
-	recordUpdateRecordConfig := recordConfigGenerator()
-	recordUpdateRecordConfig.Arguments.Records = recordUpdateRecordConfig.Arguments.UpdateRecords
+	updateRecordConfig := recordConfigGenerator()
+	updateRecordConfig.Arguments.TTL += 100
+	updateRecordConfig.Arguments.Records = updateRecordConfig.Arguments.UpdateRecords
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPDNSRecordDestroy,
 		Steps: []resource.TestStep{
-			// Initial record creation
 			{
 				Config: recordConfig.ResourceDeclaration(),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordContents(recordConfig),
-					// TestCheckResourceAttr() checks are skipped because records is not directly accessible
-					// https://github.com/hashicorp/terraform/issues/21618
-				),
+				Check:  recordConfig.ResourceChecks(),
 			},
-			// TTL update
 			{
-				Config: ttlUpdateRecordConfig.ResourceDeclaration(),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordContents(ttlUpdateRecordConfig),
-				),
-			},
-			// Records update
-			{
-				Config: recordUpdateRecordConfig.ResourceDeclaration(),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordContents(recordUpdateRecordConfig),
-				),
+				Config: updateRecordConfig.ResourceDeclaration(),
+				Check:  updateRecordConfig.ResourceChecks(),
 			},
 			{
 				ResourceName:      recordConfig.ResourceName(),
@@ -369,7 +294,93 @@ func testAccCheckPDNSRecordContents(recordConfig *PowerDNSRecordResource) resour
 	}
 }
 
-// Test Configs
+//
+// Resource Declaration types and methods
+// These types & methods define a object layout declare resources during test, to allow for easy update tests and code deduplication
+//
+type PowerDNSRecordResourceArguments struct {
+	Count   int
+	Zone    string
+	Name    string
+	Type    string
+	TTL     int
+	Records []string
+	// UpdateRecords are recordsets used for testing update behavior.
+	UpdateRecords []string
+	SetPtr        bool
+}
+
+type PowerDNSRecordResource struct {
+	Name      string
+	Arguments *PowerDNSRecordResourceArguments
+}
+
+// This function returns the record attribute ID in "records.[hash]" format for the given record
+// Record hash lookup per https://github.com/pan-net/terraform-provider-powerdns/pull/78#issuecomment-793288653
+func RecordAttributeIDForRecord(record string) string {
+	crc := int(crc32.ChecksumIEEE([]byte(record)))
+	if -crc >= 0 {
+		crc = -crc
+	}
+
+	return "records." + strconv.Itoa(crc)
+}
+
+// This function builds out a suite of checks for the resource, suitable for passing to a TestStep as Check
+func (resourceConfig *PowerDNSRecordResource) ResourceChecks() resource.TestCheckFunc {
+	var checks []resource.TestCheckFunc
+
+	checks = append(checks, testAccCheckPDNSRecordContents(resourceConfig))
+	checks = append(checks, resource.TestCheckResourceAttr(resourceConfig.ResourceName(), "zone", resourceConfig.Arguments.Zone))
+	checks = append(checks, resource.TestCheckResourceAttr(resourceConfig.ResourceName(), "name", resourceConfig.Arguments.Name))
+	checks = append(checks, resource.TestCheckResourceAttr(resourceConfig.ResourceName(), "type", resourceConfig.Arguments.Type))
+	checks = append(checks, resource.TestCheckResourceAttr(resourceConfig.ResourceName(), "ttl", strconv.Itoa(resourceConfig.Arguments.TTL)))
+
+	for _, record := range resourceConfig.Arguments.Records {
+		checks = append(checks, resource.TestCheckResourceAttr(resourceConfig.ResourceName(), RecordAttributeIDForRecord(record), record))
+	}
+
+	return resource.ComposeTestCheckFunc(checks...)
+}
+
+// This function builds out the Terraform DSL for the resource, suitable for passing to a TestStep as Config
+func (resourceConfig *PowerDNSRecordResource) ResourceDeclaration() string {
+	var encapsulatedRecords []string
+	for _, record := range resourceConfig.Arguments.Records {
+		encapsulatedRecords = append(encapsulatedRecords, (`"` + strings.Replace(record, `"`, `\"`, -1) + `"`))
+	}
+
+	resourceDeclaration := `resource "powerdns_record" "` + resourceConfig.Name + "\" {\n"
+	if resourceConfig.Arguments.Count > 0 {
+		resourceDeclaration += "  count = " + strconv.Itoa(resourceConfig.Arguments.Count) + "\n"
+	}
+
+	// zone, name, type, ttl, and records are mandatory
+	resourceDeclaration += `  zone = "` + resourceConfig.Arguments.Zone + "\"\n"
+	resourceDeclaration += `  name = "` + resourceConfig.Arguments.Name + "\"\n"
+	resourceDeclaration += `  type = "` + resourceConfig.Arguments.Type + "\"\n"
+	resourceDeclaration += "  ttl = " + strconv.Itoa(resourceConfig.Arguments.TTL) + "\n"
+	resourceDeclaration += "  records = [ " + strings.Join(encapsulatedRecords, ", ") + " ]\n"
+
+	if resourceConfig.Arguments.SetPtr {
+		resourceDeclaration += "  set_ptr = true\n"
+	}
+
+	resourceDeclaration += "}"
+
+	return resourceDeclaration
+}
+
+// This function builds out the Terraform resource ID for the resource
+func (resourceConfig *PowerDNSRecordResource) ResourceID() string {
+	return `{"zone":"` + resourceConfig.Arguments.Zone + `","id":"` + resourceConfig.Arguments.Name + ":::" + resourceConfig.Arguments.Type + `"}`
+}
+
+// This function is a trivial helper to return the Terraform resource name
+func (resourceConfig *PowerDNSRecordResource) ResourceName() string {
+	return "powerdns_record." + resourceConfig.Name
+}
+
 func NewPowerDNSRecordResource() *PowerDNSRecordResource {
 	record := &PowerDNSRecordResource{}
 	record.Arguments = &PowerDNSRecordResourceArguments{}
@@ -382,6 +393,13 @@ func NewPowerDNSRecordResource() *PowerDNSRecordResource {
 	return record
 }
 
+//
+// Test resource declaration functions
+//
+// Pattern: testPDNSRecordConfigXXX() returns a PowerDNSRecordResource struct
+// The PowerDNSRecordResource struct can be used to query test config, update attributes for update tests,
+// and can have ResourceDeclaration() called against it to generate the Terraform DSL resource block string.
+//
 func testPDNSRecordConfigRecordEmpty() *PowerDNSRecordResource {
 	record := NewPowerDNSRecordResource()
 	record.Name = "test-a"
