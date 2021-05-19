@@ -185,7 +185,7 @@ type ResourceRecordSet struct {
 	Records    []Record `json:"records,omitempty"`
 }
 
-// ResourceMetadataSet represents a PowerDNS Zone Metadata object
+// ResourceZoneMetadata represents a PowerDNS Zone Metadata object
 type ResourceZoneMetadata struct {
 	Kind     string   `json:"kind"`
 	Metadata []string `json:"metadata"`
@@ -587,6 +587,7 @@ func (client *Client) DeleteRecordSetByID(zone string, recID string) error {
 	return client.DeleteRecordSet(zone, name, tpe)
 }
 
+// GetZoneMetadata get metadata from zone by its ID
 func (client *Client) GetZoneMetadata(id string) (ResourceZoneMetadata, error) {
 	zone, kind, err := parseID(id)
 	if err != nil {
@@ -648,6 +649,7 @@ func (client *Client) UpdateZoneMetadata(zone string, zoneMetadata ResourceZoneM
 	return createdZoneMetadata.Kind, nil
 }
 
+// DeleteZoneMetadata deletes zone metadata by its ID
 func (client *Client) DeleteZoneMetadata(id string) error {
 	zone, kind, err := parseID(id)
 	if err != nil {
