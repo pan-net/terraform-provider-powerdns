@@ -28,14 +28,14 @@ func resourcePDNSZoneMetadata() *schema.Resource {
 			"kind": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: false,
+				ForceNew: true,
 			},
 
 			"metadata": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Required: true,
-				ForceNew: false,
+				ForceNew: true,
 			},
 		},
 	}

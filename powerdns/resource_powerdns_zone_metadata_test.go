@@ -75,6 +75,3 @@ resource "powerdns_zone_metadata" "test-a" {
 	kind = "ALLOW-AXFR-FROM"
 	metadata = [ ]
 }`
-
-
-
