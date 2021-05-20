@@ -88,8 +88,15 @@ func resourcePDNSZoneMetadataRead(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("Couldn't fetch PowerDNS Zone Metadata: %s", err)
 	}
 
+	zone, _, err := parseID(d.Id())
+	if err != nil {
+		return err
+	}
+
+	d.SetId(d.Id())
 	d.Set("kind", record.Kind)
 	d.Set("metadata", record.Metadata)
+	d.Set("zone", zone)
 
 	return nil
 }

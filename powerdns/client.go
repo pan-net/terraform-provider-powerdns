@@ -646,7 +646,7 @@ func (client *Client) UpdateZoneMetadata(zone string, zoneMetadata ResourceZoneM
 		return "", err
 	}
 
-	return createdZoneMetadata.Kind, nil
+	return createdZoneMetadata.ID(zone), nil
 }
 
 // DeleteZoneMetadata deletes zone metadata by its ID

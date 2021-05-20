@@ -15,63 +15,125 @@ func TestAccPDNSZoneMetadata_Empty(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config:      testPDNSZoneMetadataEmpty,
+				Config:      testPDNSZoneMetadata_Empty,
 				ExpectError: regexp.MustCompile("'metadata' must not be empty"),
 			},
 		},
 	})
 }
 
+func TestAccPDNSZoneMetadata_AxfrFrom(t *testing.T) {
+	resourceName := "powerdns_zone_metadata.test-axfr-from"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSZoneMetadataDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSZoneMetadata_AxfrFrom,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "kind", "ALLOW-AXFR-FROM"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccPDNSZoneMetadata_AxfrSource(t *testing.T) {
+	resourceName := "powerdns_zone_metadata.test-axfr-source"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSZoneMetadataDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSZoneMetadata_AxfrSource,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "kind", "AXFR-SOURCE"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccPDNSZoneMetadata_XTest(t *testing.T) {
+	resourceName := "powerdns_zone_metadata.test-x-test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSZoneMetadataDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSZoneMetadata_XTest,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "kind", "X-TEST"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckPDNSZoneMetadataDestroy(s *terraform.State) error {
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "powerdns_zone_metadata" {
+	for _, resource := range s.RootModule().Resources {
+		if resource.Type != "powerdns_zone_metadata" {
 			continue
 		}
 
 		client := testAccProvider.Meta().(*Client)
-		exists, err := client.RecordExistsByID(rs.Primary.Attributes["zone"], rs.Primary.ID)
+		exists, err := client.ZoneMetadataExists(resource.Primary.ID)
 		if err != nil {
-			return fmt.Errorf("Error checking if record still exists: %#v", rs.Primary.ID)
+			return fmt.Errorf("Error checking if zone metadata still exists: %#v", resource.Primary.ID)
 		}
 		if exists {
-			return fmt.Errorf("Record still exists: %#v", rs.Primary.ID)
+			return fmt.Errorf("Zone still exists: %#v", resource.Primary.ID)
 		}
 
 	}
 	return nil
 }
 
-func testAccCheckPDNSZoneMetadataExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Not found: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return fmt.Errorf("No Record ID is set")
-		}
-
-		client := testAccProvider.Meta().(*Client)
-		foundRecords, err := client.ListRecordsByID(rs.Primary.Attributes["zone"], rs.Primary.ID)
-		if err != nil {
-			return err
-		}
-		if len(foundRecords) == 0 {
-			return fmt.Errorf("Record does not exist")
-		}
-		for _, rec := range foundRecords {
-			if rec.ID() == rs.Primary.ID {
-				return nil
-			}
-		}
-		return fmt.Errorf("Record does not exist: %#v", rs.Primary.ID)
-	}
-}
-
-const testPDNSZoneMetadataEmpty = `
-resource "powerdns_zone_metadata" "test-a" {
+const testPDNSZoneMetadata_Empty = `
+resource "powerdns_zone_metadata" "empty" {
 	zone = "sysa.xyz."
 	kind = "ALLOW-AXFR-FROM"
 	metadata = [ ]
+}`
+
+const testPDNSZoneMetadata_AxfrFrom = `
+resource "powerdns_zone_metadata" "test-axfr-from" {
+	zone = "sysa.xyz."
+	kind = "ALLOW-AXFR-FROM"
+	metadata = ["AUTO-NS"]
+}`
+
+const testPDNSZoneMetadata_AxfrSource = `
+resource "powerdns_zone_metadata" "test-axfr-source" {
+	zone = "sysa.xyz."
+	kind = "AXFR-SOURCE"
+	metadata = ["10.0.0.1"]
+}`
+
+const testPDNSZoneMetadata_XTest = `
+resource "powerdns_zone_metadata" "test-x-test" {
+	zone = "sysa.xyz."
+	kind = "X-TEST"
+	metadata = ["test1", "test2"]
 }`
