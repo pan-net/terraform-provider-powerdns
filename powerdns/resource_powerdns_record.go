@@ -57,6 +57,27 @@ func resourcePDNSRecord() *schema.Resource {
 				ForceNew:    true,
 				Description: "For A and AAAA records, if true, create corresponding PTR.",
 			},
+
+			"comment": {
+				Type: schema.TypeSet,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"content": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+						},
+						"account": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+						},
+					},
+				},
+				Optional:    true,
+				ForceNew:    true,
+				Description: "A comment about an RRSet.",
+			},
 		},
 	}
 }
@@ -68,6 +89,21 @@ func resourcePDNSRecordCreate(d *schema.ResourceData, meta interface{}) error {
 		Name: d.Get("name").(string),
 		Type: d.Get("type").(string),
 		TTL:  d.Get("ttl").(int),
+	}
+
+	comments := d.Get("comment").(*schema.Set).List()
+	if len(comments) > 0 {
+		commentObjs := make([]Comment, 0, len(comments))
+		for _, comment := range comments {
+			commentMap := comment.(map[string]interface{})
+			commentObjs = append(
+				commentObjs,
+				Comment{
+					Content: commentMap["content"].(string),
+					Account: commentMap["account"].(string),
+				})
+		}
+		rrSet.Comments = commentObjs
 	}
 
 	zone := d.Get("zone").(string)

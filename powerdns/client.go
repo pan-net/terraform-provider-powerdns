@@ -178,11 +178,17 @@ type Record struct {
 
 // ResourceRecordSet represents a PowerDNS RRSet object
 type ResourceRecordSet struct {
-	Name       string   `json:"name"`
-	Type       string   `json:"type"`
-	ChangeType string   `json:"changetype"`
-	TTL        int      `json:"ttl"` // For API v1
-	Records    []Record `json:"records,omitempty"`
+	Name       string    `json:"name"`
+	Type       string    `json:"type"`
+	ChangeType string    `json:"changetype"`
+	TTL        int       `json:"ttl"` // For API v1
+	Records    []Record  `json:"records,omitempty"`
+	Comments   []Comment `json:"comments,omitempty"`
+}
+
+type Comment struct {
+	Content string `json:"content,omitempty"`
+	Account string `json:"account,omitempty"`
 }
 
 type zonePatchRequest struct {
