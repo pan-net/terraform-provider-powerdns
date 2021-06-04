@@ -261,7 +261,7 @@ func (client *Client) detectAPIVersion() (int, error) {
 	}
 
 	defer resp.Body.Close()
-	if resp.StatusCode == 200 {
+	if resp.StatusCode == http.StatusOK {
 		return 1, nil
 	}
 	return 0, nil
@@ -303,7 +303,7 @@ func (client *Client) GetZone(name string) (ZoneInfo, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		errorResp := new(errorResponse)
 		if err = json.NewDecoder(resp.Body).Decode(errorResp); err != nil {
 			return ZoneInfo{}, fmt.Errorf("Error getting zone: %s", name)
@@ -421,7 +421,7 @@ func (client *Client) DeleteZone(name string) error {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 204 {
+	if resp.StatusCode != http.StatusNoContent {
 		errorResp := new(errorResponse)
 		if err = json.NewDecoder(resp.Body).Decode(errorResp); err != nil {
 			return fmt.Errorf("Error deleting zone: %s", name)
@@ -535,7 +535,7 @@ func (client *Client) ReplaceRecordSet(zone string, rrSet ResourceRecordSet) (st
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 && resp.StatusCode != 204 {
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
 		errorResp := new(errorResponse)
 		if err = json.NewDecoder(resp.Body).Decode(errorResp); err != nil {
 			return "", fmt.Errorf("Error creating record set: %s", rrSet.ID())
@@ -568,7 +568,7 @@ func (client *Client) DeleteRecordSet(zone string, name string, tpe string) erro
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 && resp.StatusCode != 204 {
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
 		errorResp := new(errorResponse)
 		if err = json.NewDecoder(resp.Body).Decode(errorResp); err != nil {
 			return fmt.Errorf("Error deleting record: %s %s", name, tpe)
@@ -667,7 +667,7 @@ func (client *Client) DeleteZoneMetadata(id string) error {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		errorResp := new(errorResponse)
 		if err = json.NewDecoder(resp.Body).Decode(errorResp); err != nil {
 			return fmt.Errorf("Error deleting Zone Metadata: %s", kind)
@@ -728,7 +728,7 @@ func (client *Client) setServerVersion() error {
 		return err
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("Invalid response code from server: '%d'. Response body: %v",
 			resp.StatusCode, resp.Body)
 	}
