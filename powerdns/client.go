@@ -428,6 +428,28 @@ func (client *Client) DeleteZone(name string) error {
 
 // ListRecords returns all records in Zone
 func (client *Client) ListRecords(zone string) ([]Record, error) {
+	rrsets, err := client.ListRRSets(zone)
+	if err != nil {
+		return nil, err
+	}
+
+	var records []Record
+	// Convert the API v1 response to v0 record structure
+	for _, rrs := range rrsets {
+		for _, record := range rrs.Records {
+			records = append(records, Record{
+				Name:    rrs.Name,
+				Type:    rrs.Type,
+				Content: record.Content,
+				TTL:     rrs.TTL,
+			})
+		}
+	}
+
+	return records, nil
+}
+
+func (client *Client) getZoneInfo(zone string) (*ZoneInfo, error) {
 	req, err := client.newRequest("GET", fmt.Sprintf("/servers/localhost/zones/%s", zone), nil)
 	if err != nil {
 		return nil, err
@@ -444,21 +466,7 @@ func (client *Client) ListRecords(zone string) ([]Record, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	records := zoneInfo.Records
-	// Convert the API v1 response to v0 record structure
-	for _, rrs := range zoneInfo.ResourceRecordSets {
-		for _, record := range rrs.Records {
-			records = append(records, Record{
-				Name:    rrs.Name,
-				Type:    rrs.Type,
-				Content: record.Content,
-				TTL:     rrs.TTL,
-			})
-		}
-	}
-
-	return records, nil
+	return zoneInfo, nil
 }
 
 // ListRecordsInRRSet returns only records of specified name and type
@@ -485,6 +493,35 @@ func (client *Client) ListRecordsByID(zone string, recID string) ([]Record, erro
 		return nil, err
 	}
 	return client.ListRecordsInRRSet(zone, name, tpe)
+}
+
+//GetResourceRecordSet by zone and id
+func (client *Client) GetRRSetOfRecord(zone string, recID string) (*ResourceRecordSet, error) {
+	name, tpe, err := parseID(recID)
+	if err != nil {
+		return nil, err
+	}
+
+	rrsets, err := client.ListRRSets(zone)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, rrset := range rrsets {
+		if rrset.Name == name && rrset.Type == tpe {
+			return &rrset, nil
+		}
+	}
+	return nil, fmt.Errorf("Error getting rrset %s. Not found.", name)
+}
+
+//ListRRSets by zone
+func (client *Client) ListRRSets(zone string) ([]ResourceRecordSet, error) {
+	zoneInfo, err := client.getZoneInfo(zone)
+	if err != nil {
+		return nil, err
+	}
+	return zoneInfo.ResourceRecordSets, nil
 }
 
 // RecordExists checks if requested record exists in Zone

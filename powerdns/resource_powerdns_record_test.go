@@ -395,6 +395,9 @@ func TestAccPDNSRecord_TXT(t *testing.T) {
 }
 
 func TestAccPDNSRecord_WithComments(t *testing.T) {
+	resourceName := "powerdns_record.test-comments"
+	resourceID := `{"zone":"sysa.xyz.","id":"comment.sysa.xyz.:::A"}`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -403,8 +406,14 @@ func TestAccPDNSRecord_WithComments(t *testing.T) {
 			{
 				Config: testPDSNRecordWithComments,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckPDNSRecordExists("powerdns_record.test-comments"),
+					testAccCheckPDNSRecordExists(resourceName),
 				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
