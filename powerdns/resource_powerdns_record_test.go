@@ -262,28 +262,28 @@ func testAccCheckPDNSRecordContents(recordConfig *PowerDNSRecordResource) resour
 
 		// Assumption: Order will match between foundRecords and recordConfig.Arguments.Records
 		for idx, desiredRecordContents := range recordConfig.Arguments.Records {
-			error_prefix := ("[#" + strconv.Itoa(idx) + "/" + desiredRecordContents + "] ")
+			errorPrefix := ("[#" + strconv.Itoa(idx) + "/" + desiredRecordContents + "] ")
 
 			if idx >= len(matchingRecords) {
-				return fmt.Errorf(error_prefix + "Record not found")
+				return fmt.Errorf(errorPrefix + "Record not found")
 			}
 
 			rec := matchingRecords[idx]
 
 			if rec.Name != recordConfig.Arguments.Name {
-				return fmt.Errorf(error_prefix+"Record name field does not match: %#v : %#v", rec.Name, recordConfig.Arguments.Name)
+				return fmt.Errorf(errorPrefix+"Record name field does not match: %#v : %#v", rec.Name, recordConfig.Arguments.Name)
 			}
 
 			if rec.Type != recordConfig.Arguments.Type {
-				return fmt.Errorf(error_prefix+"Record type field does not match: %#v : %#v", rec.Type, recordConfig.Arguments.Type)
+				return fmt.Errorf(errorPrefix+"Record type field does not match: %#v : %#v", rec.Type, recordConfig.Arguments.Type)
 			}
 
 			if rec.Content != desiredRecordContents {
-				return fmt.Errorf(error_prefix+"Record content field does not match: %#v : %#v", rec.Content, desiredRecordContents)
+				return fmt.Errorf(errorPrefix+"Record content field does not match: %#v : %#v", rec.Content, desiredRecordContents)
 			}
 
 			if rec.TTL != recordConfig.Arguments.TTL {
-				return fmt.Errorf(error_prefix+"Record TTL field does not match: %#v : %#v", rec.TTL, recordConfig.Arguments.TTL)
+				return fmt.Errorf(errorPrefix+"Record TTL field does not match: %#v : %#v", rec.TTL, recordConfig.Arguments.TTL)
 			}
 
 			// Skipping check of SetPtr: this setting has been deprecated since PowerDNS 4.3.0 so the check will fail.
