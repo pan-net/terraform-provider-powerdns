@@ -434,7 +434,6 @@ func (client *Client) ListRecords(zone string) ([]Record, error) {
 	}
 
 	var records []Record
-	// Convert the API v1 response to v0 record structure
 	for _, rrs := range rrsets {
 		for _, record := range rrs.Records {
 			records = append(records, Record{
