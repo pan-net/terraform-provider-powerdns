@@ -50,19 +50,19 @@ An example creating a record with comments:
 resource "powerdns_record" "foobar" {
   zone    = "example.com."
   name    = "www.example.com."
-	type = "A"
-	ttl = 60
-	records = [ "1.1.1.1" ]
+  type = "A"
+  ttl = 60
+  records = [ "1.1.1.1" ]
 
-    comment { 
-      content = "Example comment #1"
-      account = "Example account #1"
-    }
+  comment { 
+    content = "Example comment #1"
+    account = "Example account #1"
+  }
 
-    comment { 
-      content = "Example comment #2"
-      account = "Example account #2"
-    }
+  comment { 
+    content = "Example comment #2"
+    account = "Example account #2"
+  }
 }
 ```
 
