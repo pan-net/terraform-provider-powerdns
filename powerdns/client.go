@@ -12,8 +12,8 @@ import (
 	"strconv"
 	"strings"
 
-	freecache "github.com/coocood/freecache"
-	cleanhttp "github.com/hashicorp/go-cleanhttp"
+	"github.com/coocood/freecache"
+	"github.com/hashicorp/go-cleanhttp"
 )
 
 // DefaultSchema is the value used for the URL in case
@@ -517,8 +517,8 @@ func (client *Client) getZoneInfo(zone string) (*ZoneInfo, error) {
 
 			err = client.Cache.Set([]byte(zone), cacheValue, client.CacheTTL)
 			if err != nil {
-				return nil, fmt.Errorf("The cache for REST API requests is enabled but the size isn't enough: cacheSize: %db \n %s",
-					DefaultCacheSize, err)
+				fmt.Printf("[WARN] The cache for REST API requests is enabled but"+
+					" the size isn't enough: cacheSize: %db \n %s", DefaultCacheSize, err)
 			}
 		}
 	}
