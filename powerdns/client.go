@@ -517,8 +517,7 @@ func (client *Client) getZoneInfo(zone string) (*ZoneInfo, error) {
 
 			err = client.Cache.Set([]byte(zone), cacheValue, client.CacheTTL)
 			if err != nil {
-				fmt.Printf("[WARN] The cache for REST API requests is enabled but"+
-					" the size isn't enough: cacheSize: %db \n %s", DefaultCacheSize, err)
+				return nil, err
 			}
 		}
 	}
