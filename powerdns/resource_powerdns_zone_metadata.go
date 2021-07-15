@@ -48,8 +48,9 @@ func resourcePDNSZoneMetadataCreate(d *schema.ResourceData, meta interface{}) er
 	mtdata := d.Get("metadata").(*schema.Set).List()
 
 	for _, mt := range mtdata {
-		if len(strings.Trim(mt.(string), " ")) == 0 {
-			log.Printf("[WARN] One or more values in 'metadata' contain empty '' value(s)")
+		if len(strings.TrimSpace(mt.(string))) == 0 {
+			log.Printf("[WARN] One or more values in 'metadata' contain empty value(s)")
+			break
 		}
 	}
 	if !(len(mtdata) > 0) {
