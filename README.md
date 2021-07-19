@@ -11,7 +11,10 @@ Requirements
 ------------
 
 -	[Terraform](https://www.terraform.io/downloads.html) 0.12.x
--	[Go](https://golang.org/doc/install) 1.11 (to build the provider plugin)
+-	[Go](https://golang.org/doc/install) >=1.16 (to build the provider plugin)
+-	[Goreleaser](https://goreleaser.com) >=v0.157.0 (for releasing provider plugin)
+
+The Go ang Goreleaser minimum versions were set to be able to build plugin for Darwin/ARM64 architecture [see goreleaser notes.](https://goreleaser.com/deprecations/#builds-for-darwinarm64)
 
 Using the Provider (TF 0.13+)
 ----------------------
