@@ -52,7 +52,9 @@ func Provider() terraform.ResourceProvider {
 				Description: "Set cache TTL in seconds",
 			},
 		},
-
+		DataSourcesMap: map[string]*schema.Resource{
+			"powerdns_ptr": resourcePDNSPTR(),
+		},
 		ResourcesMap: map[string]*schema.Resource{
 			"powerdns_zone":   resourcePDNSZone(),
 			"powerdns_record": resourcePDNSRecord(),
