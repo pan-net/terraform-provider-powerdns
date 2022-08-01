@@ -81,6 +81,7 @@ func sanitizeURL(URL string) (string, error) {
 	cleanURL := ""
 	host := ""
 	schema := ""
+	path := ""
 
 	var err error
 
@@ -121,7 +122,11 @@ func sanitizeURL(URL string) (string, error) {
 		host = parsedURL.Host
 	}
 
-	cleanURL = schema + "://" + host
+	if len(parsedURL.Path) > 0 {
+		path = parsedURL.Path
+	}
+
+	cleanURL = schema + "://" + host + path
 
 	return cleanURL, nil
 }
