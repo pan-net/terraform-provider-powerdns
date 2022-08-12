@@ -279,6 +279,8 @@ func (client *Client) detectAPIVersion() (int, error) {
 	defer resp.Body.Close()
 	if resp.StatusCode == 200 {
 		return 1, nil
+	} else if resp.StatusCode == 403 {
+		return -1, fmt.Errorf("Error while authenticating: %s", resp.Status)
 	}
 	return 0, nil
 }
