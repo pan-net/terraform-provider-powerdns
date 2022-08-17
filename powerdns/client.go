@@ -53,6 +53,9 @@ func NewClient(serverURL string, apiKey string, configTLS *tls.Config, cacheEnab
 			return nil, fmt.Errorf("Error while creating client: %s", err)
 		}
 		DefaultCacheSize = cacheSize * 1024 * 1024
+		log.Printf("[DEBUG] Caching: Enabled with DefaultCacheSize %d bytes", DefaultCacheSize)
+	} else {
+		log.Printf("[DEBUG] Caching: Disabled")
 	}
 
 	client := Client{
@@ -499,10 +502,14 @@ func (client *Client) ListRecords(zone string) ([]Record, error) {
 
 			err = client.Cache.Set([]byte(zone), cacheValue, client.CacheTTL)
 			if err != nil {
-				return nil, fmt.Errorf("The cache for REST API requests is enabled but the size isn't enough: cacheSize: %db \n %s",
-					DefaultCacheSize, err)
+				return nil, fmt.Errorf("The cache for REST API requests is enabled but the size isn't enough: cacheSize: %db, cacheValue length: %db \n %s",
+					DefaultCacheSize, len(cacheValue), err)
 			}
+
+			log.Printf("[DEBUG] Caching: Cache miss for %s", zone)
 		}
+	} else {
+		log.Printf("[DEBUG] Caching: Cache hit for %s", zone)
 	}
 
 	records := zoneInfo.Records
