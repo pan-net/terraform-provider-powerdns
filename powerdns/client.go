@@ -9,10 +9,13 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
+	"path"
 	"strconv"
 	"strings"
 
 	freecache "github.com/coocood/freecache"
+	"github.com/gofrs/flock"
 	cleanhttp "github.com/hashicorp/go-cleanhttp"
 )
 
@@ -481,6 +484,13 @@ func (client *Client) GetZoneInfoFromCache(zone string) (*ZoneInfo, error) {
 
 // ListRecords returns all records in Zone
 func (client *Client) ListRecords(zone string) ([]Record, error) {
+	fileLock := flock.New(path.Join(os.TempDir(), "terraform-provider-powerdns-"+zone))
+	err := fileLock.Lock()
+	if err != nil {
+		return nil, err
+	}
+	defer fileLock.Unlock()
+
 	zoneInfo, err := client.GetZoneInfoFromCache(zone)
 	if err != nil {
 		log.Printf("[WARN] module.freecache: %s: %s", zone, err)
