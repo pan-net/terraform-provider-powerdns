@@ -4,7 +4,7 @@ WEBSITE_REPO=github.com/hashicorp/terraform-website
 PKG_NAME=powerdns
 
 .EXPORT_ALL_VARIABLES:
-GOFLAGS=-mod=vendor
+GOFLAGS=
 
 default: build
 
