@@ -275,7 +275,9 @@ func (client *Client) detectAPIVersion() (int, error) {
 	if err != nil {
 		return -1, err
 	}
-
+	if resp.StatusCode >= http.StatusInternalServerError {
+		return -1, fmt.Errorf("Error getting API version: %s", resp.Status)
+	}
 	defer resp.Body.Close()
 	if resp.StatusCode == 200 {
 		return 1, nil
@@ -296,6 +298,9 @@ func (client *Client) ListZones() ([]ZoneInfo, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode >= http.StatusInternalServerError {
+		return nil, fmt.Errorf("Error getting zones")
+	}
 	var zoneInfos []ZoneInfo
 
 	err = json.NewDecoder(resp.Body).Decode(&zoneInfos)
@@ -318,6 +323,10 @@ func (client *Client) GetZone(name string) (ZoneInfo, error) {
 		return ZoneInfo{}, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode >= http.StatusInternalServerError {
+		return ZoneInfo{}, fmt.Errorf("Error getting zone")
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		errorResp := new(errorResponse)
@@ -348,6 +357,10 @@ func (client *Client) ZoneExists(name string) (bool, error) {
 		return false, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode >= http.StatusInternalServerError {
+		return false, fmt.Errorf("Error getting zone: %s", name)
+	}
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNotFound {
 		errorResp := new(errorResponse)
@@ -484,6 +497,10 @@ func (client *Client) ListRecords(zone string) ([]Record, error) {
 			return nil, err
 		}
 		defer resp.Body.Close()
+
+		if resp.StatusCode >= http.StatusInternalServerError {
+			return nil, fmt.Errorf("Error getting records for zone: %s", zone)
+		}
 
 		zoneInfo = new(ZoneInfo)
 		err = json.NewDecoder(resp.Body).Decode(zoneInfo)
